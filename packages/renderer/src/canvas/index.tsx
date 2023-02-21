@@ -1,11 +1,12 @@
 import { useEffect, useState, useRef } from 'react';
-import type {CanvasRef} from './components/Canvas';
+import type { CanvasRef } from './components/Canvas';
 import Canvas from './components/Canvas';
 import Toolbox from './components/Toolbox';
 
 const Diagram = () => {
     const container = useRef<HTMLDivElement>(null);
     const [canvasSize, setCanvasSize] = useState<{ width: number, height: number }>({ width: 200, height: 200 });
+    const [showToolbox, setShowToolbox] = useState<boolean>(false);
     const canvas = useRef<CanvasRef>(null);
 
     const resizeCanvas = () => {
@@ -26,11 +27,14 @@ const Diagram = () => {
         };
     }, []);
 
+    useEffect(() => {
+        setShowToolbox(!!canvas.current?.context);
+    }, [canvas.current]);
 
     return (
         <div className='container' ref={container}>
-            {canvas.current?.context && <Toolbox context={canvas.current.context}/>}
-            <Canvas size={canvasSize} ref={canvas}/>
+            {showToolbox && canvas.current?.context && <Toolbox context={canvas.current.context} />}
+            <Canvas size={canvasSize} ref={canvas} currentShapeType={'freehand'} />
         </div>
     );
 };
