@@ -1,0 +1,7 @@
+Doubly linked list -> undo tree
+Every type of thing you can draw is a class extending an interface so every thing knows how to be drawn, both during the first placement and when undoing/redoing
+Eveyr class should be serializable so it can be saved/loaded, this again works with the being able to draw a class
+Toolbox overlay with all available tools
+Using transparent canvas overlay to perform initial draws so you can simply clear the canvas on drag of a box for example
+Selection tool should basically track the box between mouse start and end and pickup on any drawing in between
+Maybe every item should be a class that gets drawn on a canvas, then finalized to it's own div element so it's clickable?
