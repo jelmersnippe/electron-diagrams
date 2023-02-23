@@ -36,8 +36,6 @@ class Freehand extends Shape {
     }
 
     draw(data: MouseEvent) {
-        super.draw(data);
-        
         const { x, y } = data;
         if (this.prevPoint !== null) {
             this.context.beginPath();

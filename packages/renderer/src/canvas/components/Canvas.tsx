@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import type Freehand from '../shapes/Freehand';
+import type Shape from '../shapes/Shape';
 import { createShape } from '../shapes/Freehand';
 import type { ToolboxConfiguration } from './Toolbox';
 
@@ -12,11 +12,11 @@ interface Props {
 }
 const Canvas = ({ size, configuration }: Props) => {
     const canvas = useRef<HTMLCanvasElement>(null);
-    const [currentShape, setCurrentShape] = useState<Freehand | null>(null);
-    const [history, setHistory] = useState<Freehand[]>([]);
+    const [currentShape, setCurrentShape] = useState<Shape | null>(null);
+    const [history, setHistory] = useState<Shape[]>([]);
 
     const updateCurrentShape = () => {
-        if (currentShape?.drawing) {
+        if (currentShape?.state === 'drawing') {
             return;
         }
         if (!canvas.current) {
@@ -29,9 +29,8 @@ const Canvas = ({ size, configuration }: Props) => {
 
     useEffect(() => {
         history.forEach((shape) => {
-            shape.redo({ x: 0, y: 0 });
+            shape.redo();
         });
-
     }, [size]);
 
     useEffect(() => {
@@ -45,11 +44,13 @@ const Canvas = ({ size, configuration }: Props) => {
 
         // Left mouse button is 1 in the bitmap, so the value has to be uneven if left mouse button is pressed
         const leftMouseButtonDown = data.buttons % 2 !== 0;
-        if (leftMouseButtonDown) {
-            currentShape.init(data);
-        } else if (currentShape.drawing) {
+        if (leftMouseButtonDown && currentShape.state === 'idle') {
+            currentShape.start(data);
+        } else if (currentShape.state === 'drawing') {
             currentShape.finish(data);
             setHistory([...history, currentShape]);
+            updateCurrentShape();
+        } else {
             updateCurrentShape();
         }
     };
