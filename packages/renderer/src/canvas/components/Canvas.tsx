@@ -1,46 +1,42 @@
-import { useRef, useState, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import type Freehand from '../shapes/Freehand';
-import type { ShapeType } from '../shapes/Freehand';
 import { createShape } from '../shapes/Freehand';
+import type { ToolboxConfiguration } from './Toolbox';
 
 export type CanvasRef = {
     context: CanvasRenderingContext2D | null;
 }
 interface Props {
     size: { width: number; height: number; };
-    currentShapeType: ShapeType;
+    configuration: ToolboxConfiguration;
 }
-const Canvas = forwardRef<CanvasRef, Props>(({ size, currentShapeType }, ref) => {
-    const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
+const Canvas = ({ size, configuration }: Props) => {
     const canvas = useRef<HTMLCanvasElement>(null);
     const [currentShape, setCurrentShape] = useState<Freehand | null>(null);
     const [history, setHistory] = useState<Freehand[]>([]);
 
-    useImperativeHandle(ref, () => ({
-        context
-    }));
-
-    useEffect(() => {
-        if (!canvas.current) {
-            setContext(null);
+    const updateCurrentShape = () => {
+        if (currentShape?.drawing) {
             return;
         }
-
-        setContext(canvas.current.getContext('2d'));
-    }, [canvas.current]);
-
-    const updateCurrentShape = () => {
         if (!canvas.current) {
             setCurrentShape(null);
             return;
         }
 
-        setCurrentShape(createShape(currentShapeType, canvas.current));
+        setCurrentShape(createShape(configuration.currentShapeType, canvas.current, configuration));
     };
 
     useEffect(() => {
+        history.forEach((shape) => {
+            shape.redo({ x: 0, y: 0 });
+        });
+
+    }, [size]);
+
+    useEffect(() => {
         updateCurrentShape();
-    }, [currentShapeType, canvas.current]);
+    }, [configuration, canvas.current]);
 
     const onMouseUpOrDown = (data: MouseEvent) => {
         if (!currentShape) {
@@ -84,6 +80,6 @@ const Canvas = forwardRef<CanvasRef, Props>(({ size, currentShapeType }, ref) =>
             />
         </div>
     );
-});
+};
 
 export default Canvas;

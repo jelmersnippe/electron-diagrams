@@ -2,14 +2,31 @@ import { useState, useEffect } from 'react';
 
 const DEFAULT_BRUSH_SIZE = 12;
 
-interface Props {
-    context: CanvasRenderingContext2D;
+export type ToolboxConfiguration = {
+    brushSize: number;
+    currentShapeType: 'freehand';
+    lineJoin: CanvasLineJoin;
+    lineCap: CanvasLineCap;
+    strokeStyle: string;
 }
-const Toolbox = ({ context }: Props) => {
+export const getDefaultToolboxConfiguration = (): ToolboxConfiguration => ({
+    brushSize: DEFAULT_BRUSH_SIZE,
+    currentShapeType: 'freehand',
+    lineJoin: 'round',
+    lineCap: 'round',
+    strokeStyle: 'black'
+});
+interface Props {
+    onUpdateConfiguration: (configuration: ToolboxConfiguration) => void;
+}
+const Toolbox = ({ onUpdateConfiguration }: Props) => {
     const [brushSize, setBrushSize] = useState<number>(DEFAULT_BRUSH_SIZE);
 
     useEffect(() => {
-        context.lineWidth = brushSize;
+        onUpdateConfiguration({
+            ...getDefaultToolboxConfiguration(),
+            brushSize
+        });
     }, [brushSize]);
 
     return (
