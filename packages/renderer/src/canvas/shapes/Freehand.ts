@@ -32,7 +32,7 @@ class Freehand extends Shape {
 
         const { x, y } = data;
         this.prevPoint = [x, y];
-        this.points.push({ x, y });
+        this.draw(data);
     }
 
     draw(data: MouseEvent) {
