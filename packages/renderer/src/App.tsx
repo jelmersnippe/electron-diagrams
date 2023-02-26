@@ -1,4 +1,4 @@
-import Diagram from './canvas';
+import Diagram from './diagram';
 
 const App = () => {
     return (

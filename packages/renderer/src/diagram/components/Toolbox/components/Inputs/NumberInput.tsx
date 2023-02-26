@@ -1,10 +1,10 @@
-import type { ToolboxInputProps } from '../../Input';
-import ToolboxInput from '../../Input';
+import type { ToolboxInputProps } from './Input';
+import ToolboxInput from './Input';
 
 type NumberInputProps = ToolboxInputProps<number> & {
-    min?: number;
-    max?: number;
-    step?: number;
+    min: number;
+    max: number;
+    step: number;
 };
 function NumberInput(props: NumberInputProps) {
     return (

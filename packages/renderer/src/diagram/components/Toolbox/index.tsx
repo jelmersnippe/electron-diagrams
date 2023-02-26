@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { shapeTypes } from '../shapes/Freehand';
+import { shapeTypes } from '../../shapes/Freehand';
+import ColorInput from './components/Inputs/ColorPicker';
+import NumberInput from './components/Inputs/NumberInput';
+import SelectInput from './components/Inputs/SelectInput';
 import './styles.css';
-import ColorInput from './Toolbox/Inputs/ColorPicker';
-import NumberInput from './Toolbox/Inputs/NumberInput';
-import SelectInput from './Toolbox/Inputs/SelectInput';
 
 const DEFAULT_BRUSH_SIZE = 12;
 const LINE_JOIN_OPTIONS: CanvasLineJoin[] = ['round', 'bevel', 'miter'];

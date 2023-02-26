@@ -1,5 +1,5 @@
-import type { ToolboxInputProps } from '../../Input';
-import ToolboxInput from '../../Input';
+import type { ToolboxInputProps } from './Input';
+import ToolboxInput from './Input';
 
 type SelectInputProps<T extends string | number> = ToolboxInputProps<T> & {
     options: ReadonlyArray<T>;
