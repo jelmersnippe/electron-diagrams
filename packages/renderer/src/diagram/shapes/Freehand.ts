@@ -25,7 +25,6 @@ class Freehand extends Shape {
             this.context.lineTo(currentPoint.x, currentPoint.y);
             this.context.stroke();
         }
-        this.drawBoundingBox();
     }
 
     start(data: MouseEvent) {
