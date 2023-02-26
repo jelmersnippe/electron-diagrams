@@ -1,20 +1,22 @@
 import type Shape from '../Shape';
 import type Command from './Command';
+import type CanvasState from '../../components/CanvasState';
 
 class DrawCommand implements Command {
     private readonly shape: Shape;
-    private readonly canvas: Canvas;
+    private readonly canvas: CanvasState;
     
-    constructor(shape: Shape) {
+    constructor(shape: Shape, canvas: CanvasState) {
         this.shape = shape;
+        this.canvas = canvas;
     }
 
     execute(): void {
-        this.shape.redo();
+        this.canvas.addShape(this.shape);
     }
 
     undo() {
-        throw 'Can\'t undo a draw command directly, pop it from the history instead';
+        this.canvas.removeShape(this.shape);
     }
 }
 

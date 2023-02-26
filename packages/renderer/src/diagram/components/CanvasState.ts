@@ -1,9 +1,15 @@
 import type Command from '../shapes/commands/Command';
 import type Shape from '../shapes/Shape';
 
-class Canvas {
-    private canvas: HTMLCanvasElement;
-    private context: CanvasRenderingContext2D;
+class CanvasState {
+    private _canvas: HTMLCanvasElement;
+    get canvas(): HTMLCanvasElement {
+        return this._canvas;
+    }
+    private _context: CanvasRenderingContext2D;
+    get context(): CanvasRenderingContext2D {
+        return this._context;
+    }
     private shapes: Shape[] = [];
     private history: Command[] = [];
     private _commandIndex = -1;
@@ -27,8 +33,8 @@ class Canvas {
             throw new Error('No 2d context attached to canvas');
         }
 
-        this.canvas = canvas;
-        this.context = context;
+        this._canvas = canvas;
+        this._context = context;
     }
 
     addShape(shape: Shape) {
@@ -51,8 +57,9 @@ class Canvas {
     }
 
     undo() {
-        if (this.commandIndex < 0 || this.commandIndex >= history.length) {
-            throw new Error('Command index is out of range of the history');
+        if (this.commandIndex < 0 || this.commandIndex >= this.history.length) {
+            console.warn('Either out of bounds of the array or already undid the first command');
+            return;
         }
 
         const command = this.history[this.commandIndex];
@@ -63,10 +70,10 @@ class Canvas {
     }
 
     redo() {
-        if (this.commandIndex < 0 || this.commandIndex >= history.length) {
+        if (this.commandIndex < -1 || this.commandIndex >= this.history.length) {
             throw new Error('Command index is out of range of the history');
         }
-        if (this.commandIndex === history.length - 1) {
+        if (this.commandIndex === this.history.length - 1) {
             console.warn('Already at latest change');
             return;
         }
@@ -82,16 +89,18 @@ class Canvas {
 
     executeCommand(command: Command) {
         command.execute();
-        
+
         // We are not at the head of our history, so we have to discard all 'future' commands
         if (this.commandIndex !== this.history.length - 1) {
+            console.log('Splicing history from ' + this.commandIndex + 1);
             this.history.splice(this.commandIndex + 1);
         }
-        this.history.push(command);
-        this.commandIndex++;
+        this.commandIndex = this.history.push(command) - 1;
+        console.log(this.history);
+        console.log('Adding command to history and incrementing to index ' + this.commandIndex);
 
         this.draw();
     }
 }
 
-export default Canvas;
+export default CanvasState;

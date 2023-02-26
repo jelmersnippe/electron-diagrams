@@ -1,31 +1,27 @@
 import type { ToolboxConfiguration } from '../components/Toolbox';
 import applyToolboxConfiguration from '../util/applyToolboxConfiguration';
+import DrawCommand from './commands/DrawCommand';
 import type { Point } from './Freehand';
+import type CanvasState from '../components/CanvasState';
+import type Command from './commands/Command';
 
 export default abstract class Shape {
     cursorType = 'crosshair';
-    canvas: HTMLCanvasElement;
-    context: CanvasRenderingContext2D;
-    state: 'idle' | 'drawing' | 'finished' = 'idle';
+    drawing = false;
     configuration: ToolboxConfiguration;
     mouseMoveCallback = this.draw.bind(this);
-    boundingBox: {topLeft: Point; bottomRight: Point} | null = null;
+    boundingBox: { topLeft: Point; bottomRight: Point } | null = null;
 
-    constructor(canvas: HTMLCanvasElement, configuration: ToolboxConfiguration) {
-        this.canvas = canvas;
-        const context = canvas.getContext('2d');
-        if (context === null) {
-            throw 'No 2D context found on passed canvas';
-        }
-        this.context = context;
+    canvasState: CanvasState;
+
+    constructor(canvasState: CanvasState, configuration: ToolboxConfiguration) {
+        this.canvasState = canvasState;
         this.configuration = configuration;
     }
 
     private setup() {
-        applyToolboxConfiguration(this.context, this.configuration);
-        this.canvas.style.cursor = 'crosshair';
-
-        this.state = 'drawing';
+        applyToolboxConfiguration(this.canvasState.context, this.configuration);
+        this.canvasState.canvas.style.cursor = 'crosshair';
     }
 
     drawBoundingBox() {
@@ -33,18 +29,18 @@ export default abstract class Shape {
             throw 'No bounding box found to draw';
         }
 
-        this.context.strokeStyle = '#666';
-        this.context.lineWidth = 4;
-        this.context.setLineDash([5,10]);
+        this.canvasState.context.strokeStyle = '#666';
+        this.canvasState.context.lineWidth = 4;
+        this.canvasState.context.setLineDash([5, 10]);
         const padding = this.configuration.brushSize + 5;
 
-        this.context.beginPath();
-        this.context.moveTo(this.boundingBox.topLeft.x - padding, this.boundingBox.topLeft.y - padding);
-        this.context.lineTo(this.boundingBox.bottomRight.x + padding, this.boundingBox.topLeft.y - padding);
-        this.context.lineTo(this.boundingBox.bottomRight.x + padding, this.boundingBox.bottomRight.y + padding);
-        this.context.lineTo(this.boundingBox.topLeft.x - padding, this.boundingBox.bottomRight.y + padding);
-        this.context.lineTo(this.boundingBox.topLeft.x - padding, this.boundingBox.topLeft.y - padding);
-        this.context.stroke();
+        this.canvasState.context.beginPath();
+        this.canvasState.context.moveTo(this.boundingBox.topLeft.x - padding, this.boundingBox.topLeft.y - padding);
+        this.canvasState.context.lineTo(this.boundingBox.bottomRight.x + padding, this.boundingBox.topLeft.y - padding);
+        this.canvasState.context.lineTo(this.boundingBox.bottomRight.x + padding, this.boundingBox.bottomRight.y + padding);
+        this.canvasState.context.lineTo(this.boundingBox.topLeft.x - padding, this.boundingBox.bottomRight.y + padding);
+        this.canvasState.context.lineTo(this.boundingBox.topLeft.x - padding, this.boundingBox.topLeft.y - padding);
+        this.canvasState.context.stroke();
     }
 
     redo() {
@@ -52,25 +48,22 @@ export default abstract class Shape {
     }
 
     start(event: MouseEvent) {
-        if (this.state !== 'idle') {
-            throw 'Tried to start drawing on shape that was already drawing';
-        }
         this.setup();
-        this.canvas.addEventListener('mousemove', this.mouseMoveCallback);
+        this.canvasState.canvas.addEventListener('mousemove', this.mouseMoveCallback);
+        this.drawing = true;
     }
 
     draw(event: MouseEvent) {
         throw 'Abstract method \'draw\' not implemented';
     }
 
-    finish(event: MouseEvent) {
-        if (this.state !== 'drawing') {
-            throw 'Tried to finish drawing on shape that was not drawing';
-        }
-        this.canvas.removeEventListener('mousemove', this.mouseMoveCallback);
-        this.canvas.style.cursor = 'default';
+    finish(event: MouseEvent): Command {
+        this.canvasState.canvas.removeEventListener('mousemove', this.mouseMoveCallback);
+        this.canvasState.canvas.style.cursor = 'default';
         this.setBoundingBox();
-        this.state = 'finished';
+        this.drawing = false;
+
+        return new DrawCommand(this, this.canvasState);
     }
 
     setBoundingBox() {
