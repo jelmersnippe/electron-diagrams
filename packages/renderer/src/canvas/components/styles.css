@@ -1,0 +1,14 @@
+.toolbox {
+    position: absolute;
+    transform: translateY(-50%);
+    top: 50%;
+    left: 0;
+    padding: 8px;
+    margin: 8px;
+    border: 1px solid black;
+    background: #222;
+}
+
+.toolbox label {
+    color: #fff;
+}

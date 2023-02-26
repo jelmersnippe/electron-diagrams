@@ -1,7 +1,7 @@
 import type { ToolboxConfiguration } from '../components/Toolbox';
 import Shape from './Shape';
 
-type Point = { x: number; y: number; }
+export type Point = { x: number; y: number; }
 class Freehand extends Shape {
     cursorType = 'crosshair';
 
@@ -16,15 +16,16 @@ class Freehand extends Shape {
     redo() {
         super.redo();
 
-        this.context.beginPath();
         for (let i = 1; i < this.points.length; i++) {
             const prevPoint = this.points[i - 1];
             const currentPoint = this.points[i];
 
+            this.context.beginPath();
             this.context.moveTo(prevPoint.x, prevPoint.y);
             this.context.lineTo(currentPoint.x, currentPoint.y);
+            this.context.stroke();
         }
-        this.context.stroke();
+        this.drawBoundingBox();
     }
 
     start(data: MouseEvent) {
@@ -36,8 +37,6 @@ class Freehand extends Shape {
     }
 
     draw(data: MouseEvent) {
-        super.draw(data);
-        
         const { x, y } = data;
         if (this.prevPoint !== null) {
             this.context.beginPath();
@@ -55,9 +54,20 @@ class Freehand extends Shape {
         const { x, y } = data;
         this.points.push({ x, y });
     }
+
+    setBoundingBox() {
+        const xValues = this.points.map((point) => point.x);
+        const yValues = this.points.map((point) => point.y);
+
+        this.boundingBox = {
+            topLeft: {x: Math.min(...xValues), y: Math.min(...yValues)}, 
+            bottomRight: {x: Math.max(...xValues), y: Math.max(...yValues)}
+        };
+    }
 }
 
-export type ShapeType = 'freehand';
+export const shapeTypes = ['freehand'] as const;
+export type ShapeType = typeof shapeTypes[number];
 export const createShape = (type: ShapeType, canvas: HTMLCanvasElement, configuration: ToolboxConfiguration): Shape => {
     switch (type) {
         case 'freehand':
