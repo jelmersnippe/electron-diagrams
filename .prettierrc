@@ -10,11 +10,12 @@
       }
     }
   ],
-  "trailingComma": "all",
+  "trailingComma": "none",
   "bracketSpacing": false,
   "arrowParens": "avoid",
   "proseWrap": "never",
   "htmlWhitespaceSensitivity": "strict",
   "endOfLine": "lf",
-  "singleAttributePerLine": true
+  "singleAttributePerLine": true,
+  "tabWidth": 4
 }

@@ -1,7 +1,9 @@
 import type Command from '../shapes/commands/Command';
+import type { Point } from '../shapes/Freehand';
 import type Shape from '../shapes/Shape';
+import type { BoundingBox } from '../shapes/Shape';
 
-class CanvasState {
+class DiagramState {
     private _canvas: HTMLCanvasElement;
     get canvas(): HTMLCanvasElement {
         return this._canvas;
@@ -35,6 +37,25 @@ class CanvasState {
 
         this._canvas = canvas;
         this._context = context;
+    }
+
+    getShapesWithinBoundingBox(boundingBox: BoundingBox): Shape[] {
+      return this.shapes.filter((shape) => {
+        if (!shape.boundingBox) {
+          return false;
+        }
+        const {topLeft, bottomRight} = shape.boundingBox;
+        const corners: Point[] = [topLeft, {x: topLeft.x, y: bottomRight.y}, bottomRight, {x: bottomRight.x, y: topLeft.y}];
+
+        for (const corner of corners) {
+          if (corner.x >= boundingBox.topLeft.x && corner.x <= boundingBox.bottomRight.x
+             && corner.y >= boundingBox.topLeft.y && corner.y <= boundingBox.bottomRight.y) {
+               return true;
+          }
+        }
+
+        return false;
+      });
     }
 
     addShape(shape: Shape) {
@@ -92,15 +113,12 @@ class CanvasState {
 
         // We are not at the head of our history, so we have to discard all 'future' commands
         if (this.commandIndex !== this.history.length - 1) {
-            console.log('Splicing history from ' + this.commandIndex + 1);
             this.history.splice(this.commandIndex + 1);
         }
         this.commandIndex = this.history.push(command) - 1;
-        console.log(this.history);
-        console.log('Adding command to history and incrementing to index ' + this.commandIndex);
 
         this.draw();
     }
 }
 
-export default CanvasState;
+export default DiagramState;

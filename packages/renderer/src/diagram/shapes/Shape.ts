@@ -2,19 +2,20 @@ import type { ToolboxConfiguration } from '../components/Toolbox';
 import applyToolboxConfiguration from '../util/applyToolboxConfiguration';
 import DrawCommand from './commands/DrawCommand';
 import type { Point } from './Freehand';
-import type CanvasState from '../components/CanvasState';
+import type DiagramState from '../components/CanvasState';
 import type Command from './commands/Command';
 
+export type BoundingBox = { topLeft: Point; bottomRight: Point };
 export default abstract class Shape {
     cursorType = 'crosshair';
     drawing = false;
     configuration: ToolboxConfiguration;
     mouseMoveCallback = this.draw.bind(this);
-    boundingBox: { topLeft: Point; bottomRight: Point } | null = null;
+    boundingBox: BoundingBox | null = null;
 
-    canvasState: CanvasState;
+    canvasState: DiagramState;
 
-    constructor(canvasState: CanvasState, configuration: ToolboxConfiguration) {
+    constructor(canvasState: DiagramState, configuration: ToolboxConfiguration) {
         this.canvasState = canvasState;
         this.configuration = configuration;
     }
@@ -30,7 +31,7 @@ export default abstract class Shape {
         }
 
         this.canvasState.context.strokeStyle = '#666';
-        this.canvasState.context.lineWidth = 4;
+        this.canvasState.context.lineWidth = 2;
         this.canvasState.context.setLineDash([5, 10]);
         const padding = this.configuration.brushSize + 5;
 
