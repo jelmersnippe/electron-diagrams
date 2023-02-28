@@ -40,6 +40,7 @@ class DiagramState {
     return this._actionPoints;
   }
   selectedShapes: Shape[] = [];
+  interactingWithActionPoint = false;
 
   constructor(canvas: HTMLCanvasElement) {
     const context = canvas.getContext('2d');
@@ -54,6 +55,9 @@ class DiagramState {
 
   private actionPointHoverCallback = this.handleActionPointHover.bind(this);
   private handleActionPointHover(data: MouseEvent) {
+    if (this.interactingWithActionPoint) {
+      this.draw();
+    }
     const { x, y } = data;
     for (const actionPoint of this.actionPoints) {
       if (actionPoint.area.contains({ x, y })) {
@@ -76,7 +80,7 @@ class DiagramState {
         continue;
       }
 
-      this.actionPoints.push(new MoveActionPoint(shape.boundingBox, this.canvas, shape));
+      this.actionPoints.push(new MoveActionPoint(shape.boundingBox, this));
     }
 
     return this.selectedShapes;

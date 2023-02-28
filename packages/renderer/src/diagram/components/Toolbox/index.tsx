@@ -17,7 +17,7 @@ export type ToolType = 'select' | ShapeType;
 type ToolOption = { type: ToolType; tool: (state: DiagramState, configuration: ToolboxConfiguration) => Tool };
 const tools: ToolOption[] = [
   { type: 'freehand', tool: (state, configuration) => new DrawTool(state, 'freehand', configuration) },
-  { type: 'select', tool: (state) => new SelectTool(state) }
+  { type: 'select', tool: (state) => new SelectTool(state) },
 ];
 
 export type ToolboxConfiguration = {
@@ -30,7 +30,7 @@ export const getDefaultToolboxConfiguration = (): ToolboxConfiguration => ({
   brushSize: DEFAULT_BRUSH_SIZE,
   lineJoin: 'round',
   lineCap: 'round',
-  strokeStyle: '#000000'
+  strokeStyle: '#000000',
 });
 
 interface Props {
@@ -51,7 +51,7 @@ const Toolbox = ({ diagramState }: Props) => {
   const updateProperty = <T extends keyof ToolboxConfiguration,>(property: T, value: ToolboxConfiguration[T]) => {
     setConfiguration({
       ...configuration,
-      [property]: value
+      [property]: value,
     });
   };
 

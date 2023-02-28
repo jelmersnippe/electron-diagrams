@@ -1,14 +1,13 @@
 import type DiagramState from '../../CanvasState';
+import Tool from './Tool';
 import type { Point } from '/@/diagram/shapes/Freehand';
 import BoundingBox from '/@/diagram/util/BoundingBox';
-import MouseInteractible from '/@/diagram/util/MouseInteractible';
 
-class SelectTool extends MouseInteractible {
+class SelectTool extends Tool {
   private initialPoint: Point = { x: 0, y: 0 };
-  private canvasState: DiagramState;
 
   constructor(canvasState: DiagramState) {
-    super(canvasState.canvas);
+    super(canvasState);
     this.canvasState = canvasState;
   }
 

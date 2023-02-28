@@ -2,6 +2,7 @@ import type { Point } from '../shapes/Freehand';
 import type Shape from '../shapes/Shape';
 import type BoundingBox from '../util/BoundingBox';
 import MouseInteractible from '../util/MouseInteractible';
+import type DiagramState from './CanvasState';
 
 export type ActionPointType = 'move';
 export const actionPointCursorMapping: Record<ActionPointType, string> = {
@@ -11,10 +12,12 @@ export const actionPointCursorMapping: Record<ActionPointType, string> = {
 export abstract class ActionPoint extends MouseInteractible {
   abstract type: ActionPointType;
   area: BoundingBox;
+  canvasState: DiagramState;
 
-  constructor(area: BoundingBox, canvas: HTMLCanvasElement) {
-    super(canvas);
+  constructor(area: BoundingBox, canvasState: DiagramState) {
+    super(canvasState.canvas);
     this.area = area;
+    this.canvasState = canvasState;
   }
 
   deregister() {
@@ -22,42 +25,32 @@ export abstract class ActionPoint extends MouseInteractible {
   }
 
   protected canStart(data: MouseEvent): boolean {
-    if (!super.canStart(data)) {
-      return false;
-    }
-
-    if (!this.area.contains(data)) {
-      return false;
-    }
-
-    return true;
+    return super.canStart(data) && this.area.contains(data);
   }
 }
 
 export class MoveActionPoint extends ActionPoint {
   type: ActionPointType = 'move';
-  shape: Shape;
   private previousPoint: Point = {x: 0, y: 0};
 
-  constructor(area: BoundingBox, canvas: HTMLCanvasElement, shape: Shape) {
-    super(area, canvas);
-    this.shape = shape;
-  }
-
   start(data: MouseEvent): void {
-    // TODO: disable active tool;
+    this.canvasState.interactingWithActionPoint = true;
     const {x,y} = data;
     this.previousPoint = {x, y};
   }
 
   move(data: MouseEvent): void {
     const {x, y} = data;
-    this.shape.move({x: x - this.previousPoint.x, y: y - this.previousPoint.y});
+    for (const shape of this.canvasState.selectedShapes) {
+      shape.move({x: x - this.previousPoint.x, y: y - this.previousPoint.y});
+    }
     this.previousPoint = {x,y};
   }
 
   finish(_data: MouseEvent): void {
-    // TODO: enable active tool;
+    this.canvasState.interactingWithActionPoint = false;
     // TODO: Create command for the DiagramState history
+    // Probably just revert all the shapes positions and then call executeCommand so it happens again
+    // Or create a method that only pushes a command without executing for live edits like this
   }
 }

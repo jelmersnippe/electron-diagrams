@@ -65,7 +65,6 @@ class Freehand extends Shape {
 
       // TODO: Move this generic logic to the abstract class
       this.setBoundingBox();
-      this.canvasState.selectedShapes = [this];
     }
 }
 
