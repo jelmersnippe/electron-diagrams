@@ -39,8 +39,8 @@ class DiagramState {
         this._context = context;
     }
 
-    getShapesWithinBoundingBox(boundingBox: BoundingBox): Shape[] {
-      return this.shapes.filter((shape) => {
+    selectShapesWithinBoundingBox(boundingBox: BoundingBox): Shape[] {
+      const selectedShapes = this.shapes.filter((shape) => {
         if (!shape.boundingBox) {
           return false;
         }
@@ -56,6 +56,13 @@ class DiagramState {
 
         return false;
       });
+
+      this.draw();
+      for (const shape of selectedShapes) {
+        shape.drawBoundingBox();
+      }
+
+      return selectedShapes;
     }
 
     addShape(shape: Shape) {

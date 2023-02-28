@@ -6,6 +6,7 @@ import NumberInput from './components/Inputs/NumberInput';
 import SelectInput from './components/Inputs/SelectInput';
 import './styles.css';
 import DrawTool from './tools/DrawTool';
+import SelectTool from './tools/SelectTool';
 import type Tool from './tools/Tool';
 
 const DEFAULT_BRUSH_SIZE = 12;
@@ -15,7 +16,8 @@ const LINE_CAP_OPTIONS: CanvasLineCap[] = ['butt', 'round', 'square'];
 export type ToolType = 'select' | ShapeType;
 type ToolOption = { type: ToolType; tool: (state: DiagramState, configuration: ToolboxConfiguration) => Tool };
 const tools: ToolOption[] = [
-  { type: 'freehand', tool: (state, configuration) => new DrawTool(state, 'freehand', configuration) }
+  { type: 'freehand', tool: (state, configuration) => new DrawTool(state, 'freehand', configuration) },
+  { type: 'select', tool: (state) => new SelectTool(state) }
 ];
 
 export type ToolboxConfiguration = {
@@ -35,16 +37,16 @@ interface Props {
   diagramState: DiagramState;
 }
 const Toolbox = ({ diagramState }: Props) => {
-  const [selectToolIndex, setSelectToolIndex] = useState(0);
+  const [selectedToolIndex, setSelectedToolIndex] = useState(0);
   const [configuration, setConfiguration] = useState<ToolboxConfiguration>(getDefaultToolboxConfiguration());
 
   useEffect(() => {
-    const currentTool = new DrawTool(diagramState, 'freehand', configuration);
+    const currentTool = tools[selectedToolIndex].tool(diagramState, configuration);
 
     return () => {
       currentTool.deregister();
     };
-  }, [diagramState, configuration]);
+  }, [diagramState, configuration, selectedToolIndex]);
 
   const updateProperty = <T extends keyof ToolboxConfiguration,>(property: T, value: ToolboxConfiguration[T]) => {
     setConfiguration({
@@ -59,9 +61,9 @@ const Toolbox = ({ diagramState }: Props) => {
       <div>
         <SelectInput
           label="Tool"
-          value={tools[selectToolIndex].type}
+          value={tools[selectedToolIndex].type}
           onChange={(_, index) => {
-            setSelectToolIndex(index);
+            setSelectedToolIndex(index);
           }}
           options={tools.map((tool) => tool.type)}
         />

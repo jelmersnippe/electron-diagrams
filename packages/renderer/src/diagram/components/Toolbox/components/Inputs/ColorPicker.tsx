@@ -1,7 +1,9 @@
 import type { ToolboxInputProps } from './Input';
 import ToolboxInput from './Input';
 
-type ColorInputProps = ToolboxInputProps<string>;
+type ColorInputProps = ToolboxInputProps<string> & {
+    onChange: (value: string) => void;
+};
 function ColorInput(props: ColorInputProps) {
     return (
         <ToolboxInput label={props.label}>

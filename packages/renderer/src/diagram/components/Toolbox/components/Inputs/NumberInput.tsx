@@ -5,6 +5,7 @@ type NumberInputProps = ToolboxInputProps<number> & {
     min: number;
     max: number;
     step: number;
+    onChange: (value: number) => void;
 };
 function NumberInput(props: NumberInputProps) {
     return (
