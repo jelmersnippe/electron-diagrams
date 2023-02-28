@@ -1,7 +1,8 @@
 import type Command from '../shapes/commands/Command';
 import type Shape from '../shapes/Shape';
-import BoundingBox from '../util/BoundingBox';
-import { ActionPoint, actionPointCursorMapping, MoveActionPoint } from './ActionPoint';
+import type BoundingBox from '../util/BoundingBox';
+import type { ActionPoint} from './ActionPoint';
+import { actionPointCursorMapping, MoveActionPoint } from './ActionPoint';
 
 class DiagramState {
   private _canvas: HTMLCanvasElement;
@@ -38,6 +39,7 @@ class DiagramState {
   private get actionPoints(): ActionPoint[] {
     return this._actionPoints;
   }
+  selectedShapes: Shape[] = [];
 
   constructor(canvas: HTMLCanvasElement) {
     const context = canvas.getContext('2d');
@@ -63,21 +65,21 @@ class DiagramState {
   }
 
   selectShapesWithinBoundingBox(boundingBox: BoundingBox): Shape[] {
-    const selectedShapes = this.shapes.filter((shape) => shape.boundingBox?.overlapsWith(boundingBox));
+    // Reverse the list so the latest shapes will appear on top
+    this.selectedShapes = this.shapes.filter((shape) => shape.boundingBox?.overlapsWith(boundingBox)).reverse();
 
     this.draw();
 
     this.actionPoints = [];
-    for (const shape of selectedShapes) {
+    for (const shape of this.selectedShapes) {
       if (!shape.boundingBox) {
         continue;
       }
 
-      this.actionPoints.push(new MoveActionPoint(shape.drawBoundingBox(), this.canvas, shape));
+      this.actionPoints.push(new MoveActionPoint(shape.boundingBox, this.canvas, shape));
     }
-    this.actionPoints.reverse();
 
-    return selectedShapes;
+    return this.selectedShapes;
   }
 
   addShape(shape: Shape) {
@@ -96,6 +98,9 @@ class DiagramState {
     // All shapes should be in their correct state due to the history, so we can simply draw all shapes
     for (const shape of this.shapes) {
       shape.redo();
+    }
+    for (const shape of this.selectedShapes) {
+      shape.drawBoundingBox();
     }
   }
 

@@ -1,5 +1,5 @@
-import { Point } from '../shapes/Freehand';
-import Shape from '../shapes/Shape';
+import type { Point } from '../shapes/Freehand';
+import type Shape from '../shapes/Shape';
 import type BoundingBox from '../util/BoundingBox';
 import MouseInteractible from '../util/MouseInteractible';
 
@@ -45,6 +45,7 @@ export class MoveActionPoint extends ActionPoint {
   }
 
   start(data: MouseEvent): void {
+    // TODO: disable active tool;
     const {x,y} = data;
     this.previousPoint = {x, y};
   }
@@ -56,7 +57,7 @@ export class MoveActionPoint extends ActionPoint {
   }
 
   finish(_data: MouseEvent): void {
+    // TODO: enable active tool;
     // TODO: Create command for the DiagramState history
   }
-
 }

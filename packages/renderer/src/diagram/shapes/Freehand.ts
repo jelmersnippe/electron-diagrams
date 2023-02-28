@@ -62,7 +62,10 @@ class Freehand extends Shape {
 
     move(offset: Point) {
       this.points = this.points.map((point) => ({x: point.x + offset.x, y: point.y + offset.y}));
+
+      // TODO: Move this generic logic to the abstract class
       this.setBoundingBox();
+      this.canvasState.selectedShapes = [this];
     }
 }
 
