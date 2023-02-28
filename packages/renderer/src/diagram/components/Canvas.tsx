@@ -10,7 +10,7 @@ interface Props {
   size: { width: number; height: number; };
   configuration: ToolboxConfiguration;
 }
-const Canvas = ({ size}: Props) => {
+const Canvas = ({ size }: Props) => {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [canvasState, setCanvasState] = useState<DiagramState | null>(null);
 
@@ -28,7 +28,7 @@ const Canvas = ({ size}: Props) => {
 
   return (
     <>
-      {canvasState && <Toolbox diagramState={canvasState}/>}
+      {canvasState && <Toolbox diagramState={canvasState} />}
       <div className='canvas-wrapper'>
         <button onClick={() => canvasState?.undo()}>Undo</button>
         <button onClick={() => canvasState?.redo()}>Redo</button>

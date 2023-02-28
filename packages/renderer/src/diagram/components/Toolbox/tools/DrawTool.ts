@@ -1,17 +1,19 @@
 import type { ToolboxConfiguration } from '..';
 import type DiagramState from '../../CanvasState';
-import Tool from './Tool';
 import type { ShapeType } from '/@/diagram/shapes/Freehand';
 import { createShape } from '/@/diagram/shapes/Freehand';
 import type Shape from '/@/diagram/shapes/Shape';
+import MouseInteractible from '/@/diagram/util/MouseInteractible';
 
-class DrawTool extends Tool {
+class DrawTool extends MouseInteractible {
   private shape: Shape | null = null;
   private shapeType: ShapeType;
   private configuration: ToolboxConfiguration;
+  private canvasState: DiagramState;
 
   constructor(canvasState: DiagramState, shapeType: ShapeType, configuration: ToolboxConfiguration) {
-    super(canvasState);
+    super(canvasState.canvas);
+    this.canvasState = canvasState;
     this.shapeType = shapeType;
     this.configuration = configuration;
   }

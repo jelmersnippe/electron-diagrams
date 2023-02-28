@@ -1,17 +1,18 @@
 import type { ToolboxConfiguration } from '../components/Toolbox';
 import applyToolboxConfiguration from '../util/applyToolboxConfiguration';
 import DrawCommand from './commands/DrawCommand';
-import type { Point } from './Freehand';
 import type DiagramState from '../components/CanvasState';
 import type Command from './commands/Command';
+import BoundingBox from '../util/BoundingBox';
+import type { Point } from './Freehand';
 
-export type BoundingBox = { topLeft: Point; bottomRight: Point };
 export default abstract class Shape {
     cursorType = 'crosshair';
     drawing = false;
     configuration: ToolboxConfiguration;
     mouseMoveCallback = this.draw.bind(this);
     boundingBox: BoundingBox | null = null;
+    boundingBoxPadding = 5;
 
     canvasState: DiagramState;
 
@@ -25,7 +26,8 @@ export default abstract class Shape {
         this.canvasState.canvas.style.cursor = 'crosshair';
     }
 
-    drawBoundingBox() {
+    // Returns the padded BoundingBox for any action point creation
+    drawBoundingBox(): BoundingBox {
         if (!this.boundingBox) {
             throw 'No bounding box found to draw';
         }
@@ -33,15 +35,21 @@ export default abstract class Shape {
         this.canvasState.context.strokeStyle = '#666';
         this.canvasState.context.lineWidth = 2;
         this.canvasState.context.setLineDash([5, 10]);
-        const padding = this.configuration.brushSize + 5;
+        const padding = this.configuration.brushSize + this.boundingBoxPadding;
 
+        const topLeft = {x: this.boundingBox.topLeft.x - padding, y: this.boundingBox.topLeft.y - padding};
+        const topRight = {x: this.boundingBox.bottomRight.x + padding, y: this.boundingBox.topLeft.y - padding};
+        const bottomRight = {x: this.boundingBox.bottomRight.x + padding, y: this.boundingBox.bottomRight.y + padding};
+        const bottomLeft = {x: this.boundingBox.topLeft.x - padding, y: this.boundingBox.bottomRight.y + padding};
         this.canvasState.context.beginPath();
-        this.canvasState.context.moveTo(this.boundingBox.topLeft.x - padding, this.boundingBox.topLeft.y - padding);
-        this.canvasState.context.lineTo(this.boundingBox.bottomRight.x + padding, this.boundingBox.topLeft.y - padding);
-        this.canvasState.context.lineTo(this.boundingBox.bottomRight.x + padding, this.boundingBox.bottomRight.y + padding);
-        this.canvasState.context.lineTo(this.boundingBox.topLeft.x - padding, this.boundingBox.bottomRight.y + padding);
-        this.canvasState.context.lineTo(this.boundingBox.topLeft.x - padding, this.boundingBox.topLeft.y - padding);
+        this.canvasState.context.moveTo(topLeft.x, topLeft.y);
+        this.canvasState.context.lineTo(topRight.x, topRight.y);
+        this.canvasState.context.lineTo(bottomRight.x, bottomRight.y);
+        this.canvasState.context.lineTo(bottomLeft.x, bottomLeft.y);
+        this.canvasState.context.lineTo(topLeft.x, topLeft.y);
         this.canvasState.context.stroke();
+
+        return new BoundingBox(topLeft, bottomRight);
     }
 
     redo() {
@@ -54,10 +62,6 @@ export default abstract class Shape {
         this.drawing = true;
     }
 
-    draw(event: MouseEvent) {
-        throw 'Abstract method \'draw\' not implemented';
-    }
-
     finish(event: MouseEvent): Command {
         this.canvasState.canvas.removeEventListener('mousemove', this.mouseMoveCallback);
         this.canvasState.canvas.style.cursor = 'default';
@@ -67,7 +71,7 @@ export default abstract class Shape {
         return new DrawCommand(this, this.canvasState);
     }
 
-    setBoundingBox() {
-        throw 'Abstract method \'setBoundingBox\' not implemented';
-    }
+    abstract draw(event: MouseEvent): void
+    abstract setBoundingBox(): void
+    abstract move(offset: Point): void;
 }

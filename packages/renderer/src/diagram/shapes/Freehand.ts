@@ -1,5 +1,6 @@
 import type DiagramState from '../components/CanvasState';
 import type { ToolboxConfiguration } from '../components/Toolbox';
+import BoundingBox from '../util/BoundingBox';
 import type Command from './commands/Command';
 import Shape from './Shape';
 
@@ -56,10 +57,12 @@ class Freehand extends Shape {
         const xValues = this.points.map((point) => point.x);
         const yValues = this.points.map((point) => point.y);
 
-        this.boundingBox = {
-            topLeft: { x: Math.min(...xValues), y: Math.min(...yValues) },
-            bottomRight: { x: Math.max(...xValues), y: Math.max(...yValues) }
-        };
+        this.boundingBox = new BoundingBox({ x: Math.min(...xValues), y: Math.min(...yValues) }, { x: Math.max(...xValues), y: Math.max(...yValues) });
+    }
+
+    move(offset: Point) {
+      this.points = this.points.map((point) => ({x: point.x + offset.x, y: point.y + offset.y}));
+      this.setBoundingBox();
     }
 }
 
