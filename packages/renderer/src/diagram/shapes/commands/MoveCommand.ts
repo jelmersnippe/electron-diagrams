@@ -1,28 +1,26 @@
 import type { Point } from 'electron';
-import type DiagramState from '../../components/CanvasState';
+import type Shape from '../Shape';
 import type Command from './Command';
 
 class MoveCommand implements Command {
-  private readonly canvasState: DiagramState;
+  private readonly shapes: Shape[];
   private readonly offset: Point;
 
-  constructor(canvasState: DiagramState, offset: Point) {
-    this.canvasState = canvasState;
+  constructor(shapes: Shape[], offset: Point) {
+    this.shapes = shapes;
     this.offset = offset;
   }
 
   execute(): void {
-    for (const shape of this.canvasState.selectedShapes) {
+    for (const shape of this.shapes) {
       shape.move(this.offset);
     }
-    this.canvasState.setSelectedShapes(this.canvasState.selectedShapes);
   }
 
   undo() {
-    for (const shape of this.canvasState.selectedShapes) {
+    for (const shape of this.shapes) {
       shape.move({ x: -this.offset.x, y: -this.offset.y });
     }
-    this.canvasState.setSelectedShapes(this.canvasState.selectedShapes);
   }
 }
 
