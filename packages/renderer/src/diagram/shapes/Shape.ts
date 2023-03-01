@@ -9,7 +9,6 @@ import type { Point } from './Freehand';
 export default abstract class Shape {
     cursorType = 'crosshair';
     configuration: ToolboxConfiguration;
-    mouseMoveCallback = this.draw.bind(this);
     boundingBox: BoundingBox | null = null;
     boundingBoxPadding = 5;
 
@@ -48,13 +47,11 @@ export default abstract class Shape {
         this.setup();
     }
 
-    start(event: MouseEvent) {
+    start(_event: MouseEvent) {
         this.setup();
-        this.canvasState.canvas.addEventListener('mousemove', this.mouseMoveCallback);
     }
 
-    finish(event: MouseEvent): Command {
-        this.canvasState.canvas.removeEventListener('mousemove', this.mouseMoveCallback);
+    finish(_event: MouseEvent): Command {
         this.setBoundingBox();
 
         return new DrawCommand(this, this.canvasState);

@@ -1,5 +1,7 @@
 import type DiagramState from '../components/CanvasState';
+import throttle from 'lodash.throttle';
 
+const ACTIONS_PER_SECOND = 60;
 abstract class MouseInteractible {
   abstract start(data: MouseEvent): void;
   abstract move(data: MouseEvent): void;
@@ -8,7 +10,7 @@ abstract class MouseInteractible {
   protected canvasState: DiagramState;
 
   private onMouseUpCallback = this.onMouseUp.bind(this);
-  private onMouseMoveCallback = this.move.bind(this);
+  private onMouseMoveCallback = throttle(this.move.bind(this), 1000 / ACTIONS_PER_SECOND);
 
   constructor(canvasState: DiagramState) {
     this.canvasState = canvasState;
