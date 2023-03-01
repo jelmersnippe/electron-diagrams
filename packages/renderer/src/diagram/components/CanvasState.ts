@@ -32,16 +32,7 @@ class DiagramState {
 
     return this._commandIndex;
   }
-  private _actionPoints: ActionPoint[] = [];
-  private set actionPoints(value: ActionPoint[]) {
-    for (const actionPoint of this._actionPoints) {
-      actionPoint.deregister();
-    }
-    this._actionPoints = value;
-  }
-  private get actionPoints(): ActionPoint[] {
-    return this._actionPoints;
-  }
+  private actionPoints: ActionPoint[] = [];
   selectedShapes: Shape[] = [];
   interactingWithActionPoint = false;
   currentTool: Tool = new SelectTool(this);
@@ -99,9 +90,6 @@ class DiagramState {
   setSelectedShapes(shapes: Shape[]) {
     this.selectedShapes = shapes;
 
-    for (const actionPoint of this.actionPoints) {
-      actionPoint.deregister();
-    }
     this.actionPoints = [];
     for (const shape of this.selectedShapes) {
       if (!shape.boundingBox) {

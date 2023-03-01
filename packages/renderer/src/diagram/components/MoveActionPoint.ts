@@ -31,6 +31,7 @@ export class MoveActionPoint extends ActionPoint {
     }
 
     this.canvasState.executeCommand(new MoveCommand(this.canvasState.selectedShapes, movedOffset));
+    this.canvasState.setSelectedShapes(this.canvasState.selectedShapes);
   }
 }
 

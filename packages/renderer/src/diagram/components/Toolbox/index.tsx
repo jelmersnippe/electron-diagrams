@@ -41,12 +41,7 @@ const Toolbox = ({ diagramState }: Props) => {
   const [configuration, setConfiguration] = useState<ToolboxConfiguration>(getDefaultToolboxConfiguration());
 
   useEffect(() => {
-    const currentTool = tools[selectedToolIndex].tool(diagramState, configuration);
-    diagramState.currentTool = currentTool;
-
-    return () => {
-      currentTool.deregister();
-    };
+    diagramState.currentTool = tools[selectedToolIndex].tool(diagramState, configuration);
   }, [diagramState, configuration, selectedToolIndex]);
 
   const updateProperty = <T extends keyof ToolboxConfiguration,>(property: T, value: ToolboxConfiguration[T]) => {

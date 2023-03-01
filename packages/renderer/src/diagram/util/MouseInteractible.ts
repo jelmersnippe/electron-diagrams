@@ -16,12 +16,6 @@ abstract class MouseInteractible {
     this.canvasState = canvasState;
   }
 
-  deregister() {
-    this.canvasState.canvas.removeEventListener('mouseleave', this.onMouseUpCallback);
-    this.canvasState.canvas.removeEventListener('mouseup', this.onMouseUpCallback);
-    this.canvasState.canvas.removeEventListener('mousemove', this.onMouseMoveCallback);
-  }
-
   onMouseDown(data: MouseEvent) {
     this.canvasState.interactingWithActionPoint = true;
 
