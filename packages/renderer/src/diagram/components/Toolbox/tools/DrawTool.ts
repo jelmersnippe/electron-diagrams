@@ -25,7 +25,6 @@ class DrawTool extends Tool {
       console.error('No shape created while already in move event of DrawCommand');
       return;
     }
-    console.log('move triggered');
     this.shape.draw(data);
   }
   finish(data: MouseEvent): void {
