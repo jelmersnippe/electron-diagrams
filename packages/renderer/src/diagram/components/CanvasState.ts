@@ -1,9 +1,11 @@
 import type Command from '../shapes/commands/Command';
 import type Shape from '../shapes/Shape';
 import type BoundingBox from '../util/BoundingBox';
-import type { ActionPoint} from './ActionPoint';
-import { actionPointCursorMapping} from './ActionPoint';
+import type { ActionPoint } from './ActionPoint';
+import { actionPointCursorMapping } from './ActionPoint';
 import MoveActionPoint from './MoveActionPoint';
+import SelectTool from './Toolbox/tools/SelectTool';
+import type Tool from './Toolbox/tools/Tool';
 
 class DiagramState {
   private _canvas: HTMLCanvasElement;
@@ -42,6 +44,7 @@ class DiagramState {
   }
   selectedShapes: Shape[] = [];
   interactingWithActionPoint = false;
+  currentTool: Tool = new SelectTool(this);
 
   constructor(canvas: HTMLCanvasElement) {
     const context = canvas.getContext('2d');
@@ -51,19 +54,39 @@ class DiagramState {
 
     this._canvas = canvas;
     this._context = context;
-    canvas.addEventListener('mousemove', this.actionPointHoverCallback);
+    canvas.addEventListener('mousedown', this.mouseDownCallback);
   }
 
-  private actionPointHoverCallback = this.handleActionPointHover.bind(this);
-  private handleActionPointHover(data: MouseEvent) {
-    const { x, y } = data;
+  deregister() {
+    this.canvas.removeEventListener('mousedown', this.mouseDownCallback);
+  }
+
+  private mouseDownCallback = this.mouseDown.bind(this);
+  private mouseDown(data: MouseEvent) {
+    if (this.interactingWithActionPoint) {
+      return;
+    }
+
+    const leftMouseButtonDown = data.buttons % 2 !== 0;
+    if (!leftMouseButtonDown) {
+      return;
+    }
+
     for (const actionPoint of this.actionPoints) {
-      if (actionPoint.area.contains({ x, y })) {
-        this.canvas.style.cursor = actionPointCursorMapping[actionPoint.type];
+      if (actionPoint.area.contains(data)) {
+        actionPoint.onMouseDown(data);
         return;
       }
     }
-    this.canvas.style.cursor = 'default';
+
+    for (const shape of this.shapes) {
+      if (shape.boundingBox?.contains(data)) {
+        this.setSelectedShapes([shape]);
+        return;
+      }
+    }
+
+    this.currentTool.onMouseDown(data);
   }
 
   selectShapesWithinBoundingBox(boundingBox: BoundingBox): Shape[] {

@@ -3,12 +3,11 @@ import applyToolboxConfiguration from '../util/applyToolboxConfiguration';
 import DrawCommand from './commands/DrawCommand';
 import type DiagramState from '../components/CanvasState';
 import type Command from './commands/Command';
-import BoundingBox from '../util/BoundingBox';
+import type BoundingBox from '../util/BoundingBox';
 import type { Point } from './Freehand';
 
 export default abstract class Shape {
     cursorType = 'crosshair';
-    drawing = false;
     configuration: ToolboxConfiguration;
     mouseMoveCallback = this.draw.bind(this);
     boundingBox: BoundingBox | null = null;
@@ -23,7 +22,7 @@ export default abstract class Shape {
 
     private setup() {
         applyToolboxConfiguration(this.canvasState.context, this.configuration);
-        this.canvasState.canvas.style.cursor = 'crosshair';
+        this.canvasState.context.setLineDash([]);
     }
 
     // Returns the padded BoundingBox for any action point creation
@@ -52,14 +51,11 @@ export default abstract class Shape {
     start(event: MouseEvent) {
         this.setup();
         this.canvasState.canvas.addEventListener('mousemove', this.mouseMoveCallback);
-        this.drawing = true;
     }
 
     finish(event: MouseEvent): Command {
         this.canvasState.canvas.removeEventListener('mousemove', this.mouseMoveCallback);
-        this.canvasState.canvas.style.cursor = 'default';
         this.setBoundingBox();
-        this.drawing = false;
 
         return new DrawCommand(this, this.canvasState);
     }

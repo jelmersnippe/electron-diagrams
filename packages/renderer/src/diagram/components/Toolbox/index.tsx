@@ -42,6 +42,7 @@ const Toolbox = ({ diagramState }: Props) => {
 
   useEffect(() => {
     const currentTool = tools[selectedToolIndex].tool(diagramState, configuration);
+    diagramState.currentTool = currentTool;
 
     return () => {
       currentTool.deregister();

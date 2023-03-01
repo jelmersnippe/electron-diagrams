@@ -29,8 +29,6 @@ class Freehand extends Shape {
     start(data: MouseEvent) {
         super.start(data);
 
-        // TODO: Move to configuration
-        this.canvasState.context.setLineDash([]);
         const { x, y } = data;
         this.prevPoint = [x, y];
         this.draw(data);

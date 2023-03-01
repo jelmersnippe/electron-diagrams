@@ -23,7 +23,12 @@ const Canvas = ({ size }: Props) => {
       return;
     }
 
-    setCanvasState(new DiagramState(canvas.current));
+    const newCanvasState = new DiagramState(canvas.current);
+    setCanvasState(newCanvasState);
+
+    return () => {
+      newCanvasState.deregister();
+    };
   }, [canvas.current]);
 
   return (
