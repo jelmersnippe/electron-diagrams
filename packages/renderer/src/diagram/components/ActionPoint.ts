@@ -13,7 +13,7 @@ export abstract class ActionPoint extends MouseInteractible {
   canvasState: DiagramState;
 
   constructor(area: BoundingBox, canvasState: DiagramState) {
-    super(canvasState.canvas);
+    super(canvasState);
     this.area = area;
     this.canvasState = canvasState;
   }

@@ -27,7 +27,7 @@ export default abstract class Shape {
     }
 
     // Returns the padded BoundingBox for any action point creation
-    drawBoundingBox(): BoundingBox {
+    drawBoundingBox() {
         if (!this.boundingBox) {
             throw 'No bounding box found to draw';
         }
@@ -35,21 +35,14 @@ export default abstract class Shape {
         this.canvasState.context.strokeStyle = '#666';
         this.canvasState.context.lineWidth = 2;
         this.canvasState.context.setLineDash([5, 10]);
-        const padding = this.configuration.brushSize + this.boundingBoxPadding;
 
-        const topLeft = {x: this.boundingBox.topLeft.x - padding, y: this.boundingBox.topLeft.y - padding};
-        const topRight = {x: this.boundingBox.bottomRight.x + padding, y: this.boundingBox.topLeft.y - padding};
-        const bottomRight = {x: this.boundingBox.bottomRight.x + padding, y: this.boundingBox.bottomRight.y + padding};
-        const bottomLeft = {x: this.boundingBox.topLeft.x - padding, y: this.boundingBox.bottomRight.y + padding};
         this.canvasState.context.beginPath();
-        this.canvasState.context.moveTo(topLeft.x, topLeft.y);
-        this.canvasState.context.lineTo(topRight.x, topRight.y);
-        this.canvasState.context.lineTo(bottomRight.x, bottomRight.y);
-        this.canvasState.context.lineTo(bottomLeft.x, bottomLeft.y);
-        this.canvasState.context.lineTo(topLeft.x, topLeft.y);
+        this.canvasState.context.moveTo(this.boundingBox.topLeft.x, this.boundingBox.topLeft.y);
+        this.canvasState.context.lineTo(this.boundingBox.topRight.x, this.boundingBox.topRight.y);
+        this.canvasState.context.lineTo(this.boundingBox.bottomRight.x, this.boundingBox.bottomRight.y);
+        this.canvasState.context.lineTo(this.boundingBox.bottomLeft.x, this.boundingBox.bottomLeft.y);
+        this.canvasState.context.lineTo(this.boundingBox.topLeft.x, this.boundingBox.topLeft.y);
         this.canvasState.context.stroke();
-
-        return new BoundingBox(topLeft, bottomRight);
     }
 
     redo() {

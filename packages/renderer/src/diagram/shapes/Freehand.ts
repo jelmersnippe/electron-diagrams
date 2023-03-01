@@ -29,6 +29,8 @@ class Freehand extends Shape {
     start(data: MouseEvent) {
         super.start(data);
 
+        // TODO: Move to configuration
+        this.canvasState.context.setLineDash([]);
         const { x, y } = data;
         this.prevPoint = [x, y];
         this.draw(data);
@@ -54,10 +56,11 @@ class Freehand extends Shape {
     }
 
     setBoundingBox() {
+        const padding = this.configuration.brushSize + this.boundingBoxPadding;
         const xValues = this.points.map((point) => point.x);
         const yValues = this.points.map((point) => point.y);
 
-        this.boundingBox = new BoundingBox({ x: Math.min(...xValues), y: Math.min(...yValues) }, { x: Math.max(...xValues), y: Math.max(...yValues) });
+        this.boundingBox = new BoundingBox({ x: Math.min(...xValues) - padding, y: Math.min(...yValues) - padding }, { x: Math.max(...xValues) + padding, y: Math.max(...yValues) + padding });
     }
 
     move(offset: Point) {

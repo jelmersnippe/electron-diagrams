@@ -56,9 +56,6 @@ class DiagramState {
 
   private actionPointHoverCallback = this.handleActionPointHover.bind(this);
   private handleActionPointHover(data: MouseEvent) {
-    if (this.interactingWithActionPoint) {
-      this.draw();
-    }
     const { x, y } = data;
     for (const actionPoint of this.actionPoints) {
       if (actionPoint.area.contains({ x, y })) {
@@ -71,10 +68,17 @@ class DiagramState {
 
   selectShapesWithinBoundingBox(boundingBox: BoundingBox): Shape[] {
     // Reverse the list so the latest shapes will appear on top
-    this.selectedShapes = this.shapes.filter((shape) => shape.boundingBox?.overlapsWith(boundingBox)).reverse();
+    this.setSelectedShapes(this.shapes.filter((shape) => shape.boundingBox?.overlapsWith(boundingBox)).reverse());
 
-    this.draw();
+    return this.selectedShapes;
+  }
 
+  setSelectedShapes(shapes: Shape[]) {
+    this.selectedShapes = shapes;
+
+    for (const actionPoint of this.actionPoints) {
+      actionPoint.deregister();
+    }
     this.actionPoints = [];
     for (const shape of this.selectedShapes) {
       if (!shape.boundingBox) {
@@ -84,7 +88,7 @@ class DiagramState {
       this.actionPoints.push(new MoveActionPoint(shape.boundingBox, this));
     }
 
-    return this.selectedShapes;
+    this.draw();
   }
 
   addShape(shape: Shape) {
@@ -106,6 +110,10 @@ class DiagramState {
     }
     for (const shape of this.selectedShapes) {
       shape.drawBoundingBox();
+    }
+    for (const actionPoint of this.actionPoints) {
+      this.context.fillStyle = '#FF000040';
+      this.context.fillRect(actionPoint.area.topLeft.x, actionPoint.area.topLeft.y, actionPoint.area.bottomRight.x - actionPoint.area.topLeft.x, actionPoint.area.bottomRight.y - actionPoint.area.topLeft.y);
     }
   }
 

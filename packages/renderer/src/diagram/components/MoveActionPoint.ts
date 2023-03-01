@@ -9,7 +9,6 @@ export class MoveActionPoint extends ActionPoint {
   private previousPoint: Point = {x: 0, y: 0};
 
   start(data: MouseEvent): void {
-    this.canvasState.interactingWithActionPoint = true;
     const {x,y} = data;
     this.initialPoint = {x, y};
     this.previousPoint = {x, y};
@@ -20,18 +19,18 @@ export class MoveActionPoint extends ActionPoint {
     for (const shape of this.canvasState.selectedShapes) {
       shape.move({x: x - this.previousPoint.x, y: y - this.previousPoint.y});
     }
+    this.canvasState.draw();
     this.previousPoint = {x,y};
   }
 
   finish(data: MouseEvent): void {
-    this.canvasState.interactingWithActionPoint = false;
     const movedOffset: Point = {x: data.x - this.initialPoint.x, y: data.y - this.initialPoint.y};
     // Revert all shapes back to initial position
     for (const shape of this.canvasState.selectedShapes) {
       shape.move({x: -movedOffset.x, y: -movedOffset.y});
     }
 
-    this.canvasState.executeCommand(new MoveCommand(this.canvasState.selectedShapes, movedOffset));
+    this.canvasState.executeCommand(new MoveCommand(this.canvasState, movedOffset));
   }
 }
 
