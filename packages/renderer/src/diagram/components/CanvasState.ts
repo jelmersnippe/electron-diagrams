@@ -2,7 +2,8 @@ import type Command from '../shapes/commands/Command';
 import type Shape from '../shapes/Shape';
 import type BoundingBox from '../util/BoundingBox';
 import type { ActionPoint} from './ActionPoint';
-import { actionPointCursorMapping, MoveActionPoint } from './ActionPoint';
+import { actionPointCursorMapping} from './ActionPoint';
+import MoveActionPoint from './MoveActionPoint';
 
 class DiagramState {
   private _canvas: HTMLCanvasElement;
@@ -118,6 +119,8 @@ class DiagramState {
     command.undo();
     this.commandIndex--;
 
+    this.selectedShapes = [];
+    this.actionPoints = [];
     this.draw();
   }
 
@@ -136,6 +139,8 @@ class DiagramState {
 
     this.commandIndex++;
 
+    this.selectedShapes = [];
+    this.actionPoints = [];
     this.draw();
   }
 
