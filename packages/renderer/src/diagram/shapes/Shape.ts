@@ -3,14 +3,16 @@ import applyToolboxConfiguration from '../util/applyToolboxConfiguration';
 import DrawCommand from './commands/DrawCommand';
 import type DiagramState from '../components/CanvasState';
 import type Command from './commands/Command';
-import type BoundingBox from '../util/BoundingBox';
+import BoundingBox from '../util/BoundingBox';
 import type { Point } from './Freehand';
+import type { ActionPoint } from '../components/ActionPoint';
 
 export default abstract class Shape {
     cursorType = 'crosshair';
     configuration: ToolboxConfiguration;
-    boundingBox: BoundingBox | null = null;
+    boundingBox: BoundingBox = new BoundingBox({x: 0, y: 0}, {x: 0, y: 0});
     boundingBoxPadding = 5;
+    abstract actionPoints: (() => ActionPoint)[];
 
     canvasState: DiagramState;
 

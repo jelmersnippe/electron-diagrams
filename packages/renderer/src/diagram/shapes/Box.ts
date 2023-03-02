@@ -1,6 +1,23 @@
+import type { ActionPoint } from '../components/ActionPoint';
+import ConnectionActionPoint from '../components/ConnectionActionPoint';
+import BoundingBox from '../util/BoundingBox';
 import PredefinedShape from './PredefinedShape';
 
 class Box extends PredefinedShape {
+    actionPoints: (() => ActionPoint)[] = [
+      () => new ConnectionActionPoint('down', new BoundingBox(
+        {x: this.boundingBox.center.x - 8, y: this.boundingBox.center.y + (this.boundingBox.height / 2)},
+        {x: this.boundingBox.center.x + 8, y: this.boundingBox.center.y + (this.boundingBox.height / 2) + 30}), this.canvasState),
+      () => new ConnectionActionPoint('right', new BoundingBox(
+        {x: this.boundingBox.center.x + (this.boundingBox.width / 2), y: this.boundingBox.center.y - 8 },
+        {x: this.boundingBox.center.x + (this.boundingBox.width / 2) + 30, y: this.boundingBox.center.y + 8}), this.canvasState),
+      () => new ConnectionActionPoint('up', new BoundingBox(
+        {x: this.boundingBox.center.x - 8, y: this.boundingBox.center.y - (this.boundingBox.height / 2)},
+        {x: this.boundingBox.center.x + 8, y: this.boundingBox.center.y - (this.boundingBox.height / 2) - 30}), this.canvasState),
+      () => new ConnectionActionPoint('left', new BoundingBox(
+        {x: this.boundingBox.center.x - (this.boundingBox.width / 2), y: this.boundingBox.center.y - 8 },
+        {x: this.boundingBox.center.x - (this.boundingBox.width / 2) - 30, y: this.boundingBox.center.y + 8}), this.canvasState),
+    ];
     protected minWidth= 100;
     protected minHeight= 50;
 

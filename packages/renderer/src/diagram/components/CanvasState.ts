@@ -32,7 +32,14 @@ class DiagramState {
     return this._commandIndex;
   }
   private actionPoints: ActionPoint[] = [];
-  selectedShapes: Shape[] = [];
+  private _selectedShapes: Shape[] = [];
+  get selectedShapes(): Shape[] {
+    return this._selectedShapes;
+  }
+  set selectedShapes(shapes: Shape[]) {
+    this._selectedShapes = shapes;
+    this.draw();
+  }
   interactingWithActionPoint = false;
   currentTool: Tool = new SelectTool(this);
 
@@ -69,9 +76,9 @@ class DiagramState {
       }
     }
 
-    for (const shape of this.shapes) {
+    for (const shape of [...this.shapes].reverse()) {
       if (shape.boundingBox?.contains(data)) {
-        this.setSelectedShapes([shape]);
+        this.selectedShapes = [shape];
         return;
       }
     }
@@ -79,26 +86,9 @@ class DiagramState {
     this.currentTool.onMouseDown(data);
   }
 
-  selectShapesWithinBoundingBox(boundingBox: BoundingBox): Shape[] {
+  selectShapesWithinBoundingBox(boundingBox: BoundingBox) {
     // Reverse the list so the latest shapes will appear on top
-    this.setSelectedShapes(this.shapes.filter((shape) => shape.boundingBox?.overlapsWith(boundingBox)).reverse());
-
-    return this.selectedShapes;
-  }
-
-  setSelectedShapes(shapes: Shape[]) {
-    this.selectedShapes = shapes;
-
-    this.actionPoints = [];
-    for (const shape of this.selectedShapes) {
-      if (!shape.boundingBox) {
-        continue;
-      }
-
-      this.actionPoints.push(new MoveActionPoint(shape.boundingBox, this));
-    }
-
-    this.draw();
+    this.selectedShapes = this.shapes.filter((shape) => shape.boundingBox?.overlapsWith(boundingBox)).reverse();
   }
 
   addShape(shape: Shape) {
@@ -114,10 +104,19 @@ class DiagramState {
 
   draw() {
     this.context.clearRect(0, 0, this.context.canvas.width, this.context.canvas.height);
+
+    this.actionPoints = [];
     // All shapes should be in their correct state due to the history, so we can simply draw all shapes
     for (const shape of this.shapes) {
       shape.redo();
+      for (const actionPoint of shape.actionPoints) {
+        this.actionPoints.push(actionPoint());
+      }
     }
+    for (const shape of this.selectedShapes) {
+      this.actionPoints.push(new MoveActionPoint(shape.boundingBox, this));
+    }
+
     for (const actionPoint of this.actionPoints) {
       actionPoint.draw();
     }
@@ -133,9 +132,8 @@ class DiagramState {
     command.undo();
     this.commandIndex--;
 
+    // Updating selectedShapes triggers a draw
     this.selectedShapes = [];
-    this.actionPoints = [];
-    this.draw();
   }
 
   redo() {
@@ -153,9 +151,8 @@ class DiagramState {
 
     this.commandIndex++;
 
+    // Updating selectedShapes triggers a draw
     this.selectedShapes = [];
-    this.actionPoints = [];
-    this.draw();
   }
 
   executeCommand(command: Command) {

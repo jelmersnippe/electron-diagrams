@@ -19,7 +19,6 @@ export class MoveActionPoint extends ActionPoint {
     for (const shape of this.canvasState.selectedShapes) {
       shape.move({ x: x - this.previousPoint.x, y: y - this.previousPoint.y });
     }
-    this.canvasState.setSelectedShapes(this.canvasState.selectedShapes);
     this.canvasState.draw();
     this.previousPoint = { x, y };
   }
@@ -32,7 +31,6 @@ export class MoveActionPoint extends ActionPoint {
     }
 
     this.canvasState.executeCommand(new MoveCommand(this.canvasState.selectedShapes, movedOffset));
-    this.canvasState.setSelectedShapes(this.canvasState.selectedShapes);
   }
 
   draw(): void {

@@ -1,3 +1,4 @@
+import type { ActionPoint } from '../components/ActionPoint';
 import type DiagramState from '../components/CanvasState';
 import type { ToolboxConfiguration } from '../components/Toolbox';
 import BoundingBox from '../util/BoundingBox';
@@ -7,6 +8,7 @@ import Shape from './Shape';
 
 export type Point = { x: number; y: number; }
 class Freehand extends Shape {
+    actionPoints: (() => ActionPoint)[] = [];
     cursorType = 'crosshair';
 
     prevPoint: [number, number] | null = null;
