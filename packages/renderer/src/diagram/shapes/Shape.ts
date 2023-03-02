@@ -23,24 +23,6 @@ export default abstract class Shape {
         applyToolboxConfiguration(this.canvasState.context, this.configuration);
     }
 
-    drawBoundingBox() {
-        if (!this.boundingBox) {
-            throw 'No bounding box found to draw';
-        }
-
-        this.canvasState.context.strokeStyle = '#666';
-        this.canvasState.context.lineWidth = 2;
-        this.canvasState.context.setLineDash([5, 10]);
-
-        this.canvasState.context.beginPath();
-        this.canvasState.context.moveTo(this.boundingBox.topLeft.x, this.boundingBox.topLeft.y);
-        this.canvasState.context.lineTo(this.boundingBox.topRight.x, this.boundingBox.topRight.y);
-        this.canvasState.context.lineTo(this.boundingBox.bottomRight.x, this.boundingBox.bottomRight.y);
-        this.canvasState.context.lineTo(this.boundingBox.bottomLeft.x, this.boundingBox.bottomLeft.y);
-        this.canvasState.context.lineTo(this.boundingBox.topLeft.x, this.boundingBox.topLeft.y);
-        this.canvasState.context.stroke();
-    }
-
     redo() {
         this.setup();
     }

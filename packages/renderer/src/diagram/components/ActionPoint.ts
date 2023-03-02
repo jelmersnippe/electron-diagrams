@@ -17,5 +17,7 @@ export abstract class ActionPoint extends MouseInteractible {
     this.area = area;
     this.canvasState = canvasState;
   }
+
+  abstract draw(): void;
 }
 

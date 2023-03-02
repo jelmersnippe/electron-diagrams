@@ -2,7 +2,6 @@
 
 ## TODO
 1. Change cursor upon entering/leaving MouseInteractible (cursorType or currentTool cursorType)
-1. Resizable shapes (activity boxes) (These should just have an updating boundingbox and be drawn based on bounding box)
 1. Connections that spawn from ActionPoint items on activity boxes
 1. Labels for shapes
 1. Text boxes
@@ -12,13 +11,15 @@
 1. Keyboard hotkeys (unselecting with escape especially)
 1. Exporting to image
 1. Serializing and persisting of data to keep on reload (save/loading basically)
+1. Snap to lineup with other things while moving
 
 ## Known BugO's
-1. When moving shapes quickly the boundingbox updates properly, but the connected ActionPoint lags behind
+1. Cursor position does not always correspond to x and y in MouseEvent
 
 
 ## To think about
 1. Maybe make selecting items require a modifier key. Currently you can't draw within the bounding box of another shape which is annoying
 1. Resizing Freehand shapes will be tough because you can't simply increase width/height. Look into some scaling option
-1. Resizing a 
+1. Added a padded bounding box property to shapes, so we have the true size (used for drawing), and the padded version used for selection based actionpoints
+
 

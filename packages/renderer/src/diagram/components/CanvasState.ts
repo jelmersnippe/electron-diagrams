@@ -2,7 +2,6 @@ import type Command from '../shapes/commands/Command';
 import type Shape from '../shapes/Shape';
 import type BoundingBox from '../util/BoundingBox';
 import type { ActionPoint } from './ActionPoint';
-import { actionPointCursorMapping } from './ActionPoint';
 import MoveActionPoint from './MoveActionPoint';
 import SelectTool from './Toolbox/tools/SelectTool';
 import type Tool from './Toolbox/tools/Tool';
@@ -119,12 +118,8 @@ class DiagramState {
     for (const shape of this.shapes) {
       shape.redo();
     }
-    for (const shape of this.selectedShapes) {
-      shape.drawBoundingBox();
-    }
     for (const actionPoint of this.actionPoints) {
-      this.context.fillStyle = '#FF000040';
-      this.context.fillRect(actionPoint.area.topLeft.x, actionPoint.area.topLeft.y, actionPoint.area.bottomRight.x - actionPoint.area.topLeft.x, actionPoint.area.bottomRight.y - actionPoint.area.topLeft.y);
+      actionPoint.draw();
     }
   }
 
