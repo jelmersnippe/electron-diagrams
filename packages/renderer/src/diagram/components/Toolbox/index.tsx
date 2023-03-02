@@ -17,6 +17,7 @@ export type ToolType = 'select' | ShapeType;
 type ToolOption = { type: ToolType; tool: (state: DiagramState, configuration: ToolboxConfiguration) => Tool };
 const tools: ToolOption[] = [
   { type: 'freehand', tool: (state, configuration) => new DrawTool(state, 'freehand', configuration) },
+  { type: 'box', tool: (state, configuration) => new DrawTool(state, 'box', configuration) },
   { type: 'select', tool: (state) => new SelectTool(state) },
 ];
 
@@ -25,12 +26,14 @@ export type ToolboxConfiguration = {
   lineJoin: CanvasLineJoin;
   lineCap: CanvasLineCap;
   strokeStyle: string;
+  lineDash: number[];
 }
 export const getDefaultToolboxConfiguration = (): ToolboxConfiguration => ({
   brushSize: DEFAULT_BRUSH_SIZE,
   lineJoin: 'round',
   lineCap: 'round',
   strokeStyle: '#000000',
+  lineDash: [],
 });
 
 interface Props {

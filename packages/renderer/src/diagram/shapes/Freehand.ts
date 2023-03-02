@@ -1,6 +1,7 @@
 import type DiagramState from '../components/CanvasState';
 import type { ToolboxConfiguration } from '../components/Toolbox';
 import BoundingBox from '../util/BoundingBox';
+import Box from './Box';
 import type Command from './commands/Command';
 import Shape from './Shape';
 
@@ -69,12 +70,14 @@ class Freehand extends Shape {
     }
 }
 
-export const shapeTypes = ['freehand'] as const;
+export const shapeTypes = ['freehand', 'box'] as const;
 export type ShapeType = typeof shapeTypes[number];
 export const createShape = (type: ShapeType, canvasState: DiagramState, configuration: ToolboxConfiguration): Shape => {
     switch (type) {
         case 'freehand':
             return new Freehand(canvasState, configuration);
+        case 'box':
+          return new Box(canvasState, configuration);
     }
 };
 

@@ -5,6 +5,7 @@ const applyToolboxConfiguration = (context: CanvasRenderingContext2D, configurat
     context.lineJoin = configuration.lineJoin;
     context.lineCap = configuration.lineCap;
     context.strokeStyle = configuration.strokeStyle;
+    context.setLineDash(configuration.lineDash);
 };
 
 export default applyToolboxConfiguration;

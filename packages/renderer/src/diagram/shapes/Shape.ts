@@ -21,10 +21,8 @@ export default abstract class Shape {
 
     private setup() {
         applyToolboxConfiguration(this.canvasState.context, this.configuration);
-        this.canvasState.context.setLineDash([]);
     }
 
-    // Returns the padded BoundingBox for any action point creation
     drawBoundingBox() {
         if (!this.boundingBox) {
             throw 'No bounding box found to draw';

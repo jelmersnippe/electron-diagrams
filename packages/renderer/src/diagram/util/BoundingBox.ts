@@ -6,6 +6,8 @@ class BoundingBox {
   readonly bottomLeft: Point;
   readonly bottomRight: Point;
   readonly center: Point;
+  readonly width: number;
+  readonly height: number;
 
   constructor(pointA: Point, pointB: Point) {
     const minX = Math.min(pointA.x, pointB.x);
@@ -16,7 +18,9 @@ class BoundingBox {
     this.topRight = { x: maxX, y: minY };
     this.bottomLeft = { x: minX, y: maxY };
     this.bottomRight = { x: maxX, y: maxY };
-    this.center = {x: maxX - minX, y: maxY - minY};
+    this.width = maxX - minX;
+    this.height = maxY - minY;
+    this.center = {x: minX + (this.width / 2), y: minY + (this.height / 2)};
   }
 
   overlapsWith(boundingBox: BoundingBox): boolean {
