@@ -11,7 +11,7 @@ class Freehand extends Shape {
     actionPoints: (() => ActionPoint)[] = [];
     cursorType = 'crosshair';
 
-    prevPoint: [number, number] | null = null;
+    prevPoint: Point | null = null;
     mouseMoveCallback = this.draw.bind(this);
     points: Point[] = [];
 
@@ -29,28 +29,28 @@ class Freehand extends Shape {
         }
     }
 
-    start(data: MouseEvent) {
+    start(data: Point) {
         super.start(data);
 
         const { x, y } = data;
-        this.prevPoint = [x, y];
+        this.prevPoint = {x, y};
         this.draw(data);
     }
 
-    draw(data: MouseEvent) {
+    draw(data: Point) {
         const { x, y } = data;
         if (this.prevPoint !== null) {
             this.canvasState.context.beginPath();
-            this.canvasState.context.moveTo(this.prevPoint[0], this.prevPoint[1]);
+            this.canvasState.context.moveTo(this.prevPoint.x, this.prevPoint.y);
             this.points.push({ x, y });
             this.canvasState.context.lineTo(x, y);
             this.canvasState.context.stroke();
         }
 
-        this.prevPoint = [x, y];
+        this.prevPoint = {x, y};
     }
 
-    finish(data: MouseEvent): Command {
+    finish(data: Point): Command {
         const { x, y } = data;
         this.points.push({ x, y });
         return super.finish(data);

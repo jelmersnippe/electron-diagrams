@@ -29,17 +29,17 @@ export default abstract class Shape {
         this.setup();
     }
 
-    start(_event: MouseEvent) {
+    start(_event: Point) {
         this.setup();
     }
 
-    finish(_event: MouseEvent): Command {
+    finish(_event: Point): Command {
         this.setBoundingBox();
 
         return new DrawCommand(this, this.canvasState);
     }
 
-    abstract draw(event: MouseEvent): void
+    abstract draw(event: Point): void
     abstract setBoundingBox(): void
     abstract move(offset: Point): void;
 }

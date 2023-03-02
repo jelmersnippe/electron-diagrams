@@ -1,18 +1,22 @@
-import { Point } from '../shapes/Freehand';
+import Connection from '../shapes/Connection';
+import type { Point } from '../shapes/Freehand';
 import type BoundingBox from '../util/BoundingBox';
 import type { ActionPointType } from './ActionPoint';
 import { ActionPoint } from './ActionPoint';
 import type DiagramState from './CanvasState';
+import type { ToolboxConfiguration } from './Toolbox';
 
 type Direction = 'left' | 'right' | 'up' | 'down';
 class ConnectionActionPoint extends ActionPoint {
   private startPoint: Point;
   private endPoint: Point;
   private arrowSidePoints: [Point, Point];
+  private connection: Connection;
 
   type: ActionPointType = 'connection';
-  constructor(direction: Direction, area: BoundingBox, canvasState: DiagramState) {
+  constructor(direction: Direction, configuration: ToolboxConfiguration, area: BoundingBox, canvasState: DiagramState) {
     super(area, canvasState);
+    this.connection = new Connection(this.canvasState, configuration);
 
     const isVertical = this.area.height > this.area.width;
     const halfShortSide = isVertical ? this.area.width /2 : this.area.height/ 2;
@@ -52,14 +56,18 @@ class ConnectionActionPoint extends ActionPoint {
     this.canvasState.context.fillStyle = '#FF000040';
     this.canvasState.context.fillRect(this.area.topLeft.x, this.area.topLeft.y, this.area.bottomRight.x - this.area.topLeft.x, this.area.bottomRight.y - this.area.topLeft.y);
   }
-  start(data: MouseEvent): void {
+  start(_data: MouseEvent): void {
     console.log('starting connection creationg');
+    this.connection.start(this.startPoint);
   }
   move(data: MouseEvent): void {
     console.log('moving connection creationg');
+    this.canvasState.draw();
+    this.connection.draw(data);
   }
   finish(data: MouseEvent): void {
     console.log('finishing connection creationg');
+    this.canvasState.executeCommand(this.connection.finish(data));
   }
 }
 

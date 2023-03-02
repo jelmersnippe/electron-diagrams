@@ -5,16 +5,16 @@ import PredefinedShape from './PredefinedShape';
 
 class Box extends PredefinedShape {
     actionPoints: (() => ActionPoint)[] = [
-      () => new ConnectionActionPoint('down', new BoundingBox(
+      () => new ConnectionActionPoint('down', this.configuration, new BoundingBox(
         {x: this.boundingBox.center.x - 8, y: this.boundingBox.center.y + (this.boundingBox.height / 2)},
         {x: this.boundingBox.center.x + 8, y: this.boundingBox.center.y + (this.boundingBox.height / 2) + 30}), this.canvasState),
-      () => new ConnectionActionPoint('right', new BoundingBox(
+      () => new ConnectionActionPoint('right', this.configuration, new BoundingBox(
         {x: this.boundingBox.center.x + (this.boundingBox.width / 2), y: this.boundingBox.center.y - 8 },
         {x: this.boundingBox.center.x + (this.boundingBox.width / 2) + 30, y: this.boundingBox.center.y + 8}), this.canvasState),
-      () => new ConnectionActionPoint('up', new BoundingBox(
+      () => new ConnectionActionPoint('up', this.configuration, new BoundingBox(
         {x: this.boundingBox.center.x - 8, y: this.boundingBox.center.y - (this.boundingBox.height / 2)},
         {x: this.boundingBox.center.x + 8, y: this.boundingBox.center.y - (this.boundingBox.height / 2) - 30}), this.canvasState),
-      () => new ConnectionActionPoint('left', new BoundingBox(
+      () => new ConnectionActionPoint('left', this.configuration, new BoundingBox(
         {x: this.boundingBox.center.x - (this.boundingBox.width / 2), y: this.boundingBox.center.y - 8 },
         {x: this.boundingBox.center.x - (this.boundingBox.width / 2) - 30, y: this.boundingBox.center.y + 8}), this.canvasState),
     ];
