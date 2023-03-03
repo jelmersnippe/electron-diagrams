@@ -6,9 +6,9 @@ class DrawCommand implements Command {
     private readonly shape: Shape;
     private readonly canvas: DiagramState;
 
-    constructor(shape: Shape, canvas: DiagramState) {
+    constructor(shape: Shape) {
         this.shape = shape;
-        this.canvas = canvas;
+        this.canvas = shape.canvasState;
     }
 
     execute(): void {

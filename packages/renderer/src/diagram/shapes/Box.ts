@@ -3,6 +3,8 @@ import ConnectionActionPoint from '../components/ConnectionActionPoint';
 import PredefinedShape from './PredefinedShape';
 
 class Box extends PredefinedShape {
+  canHaveConnections = true;
+
   actionPoints: (() => ActionPoint)[] = [
     () => new ConnectionActionPoint('top', this),
     () => new ConnectionActionPoint('bottom', this),

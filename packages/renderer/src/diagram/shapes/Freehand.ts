@@ -8,6 +8,7 @@ import Shape from './Shape';
 
 export type Point = { x: number; y: number; }
 class Freehand extends Shape {
+  canHaveConnections = false;
   actionPoints: (() => ActionPoint)[] = [];
   cursorType = 'crosshair';
 

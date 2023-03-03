@@ -13,6 +13,7 @@ export default abstract class Shape {
     boundingBox: BoundingBox = new BoundingBox({x: 0, y: 0}, {x: 0, y: 0});
     boundingBoxPadding = 5;
     abstract actionPoints: (() => ActionPoint)[];
+    abstract canHaveConnections: boolean;
 
     canvasState: DiagramState;
 
@@ -28,7 +29,7 @@ export default abstract class Shape {
     finish(_event: Point): Command {
         this.setBoundingBox();
 
-        return new DrawCommand(this, this.canvasState);
+        return new DrawCommand(this);
     }
 
     abstract redo(): void;

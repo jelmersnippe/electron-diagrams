@@ -70,9 +70,9 @@ class ConnectionActionPoint extends ActionPoint {
   start(_data: MouseEvent): void {
     this.connection.start(this.startPoint);
   }
-  private getSnapLocation(data: MouseEvent): Point {
-    let snapLocation: Point= {x: data.x, y: data.y};
-    for (const shape of this.shape.canvasState.shapes.filter((shape) => shape !== this.shape)) {
+  private getSnapLocation(data: MouseEvent): Point | null {
+    let snapLocation: Point | null = null;
+    for (const shape of this.shape.canvasState.shapes.filter((shape) => shape !== this.shape).filter((shape) => shape.canHaveConnections)) {
       if (!shape.boundingBox.contains(data)) {
         continue;
       }
@@ -84,10 +84,16 @@ class ConnectionActionPoint extends ActionPoint {
   }
   move(data: MouseEvent): void {
     this.canvasState.draw();
-    this.connection.draw(this.getSnapLocation(data));
+    this.connection.draw(this.getSnapLocation(data) ?? data);
   }
   finish(data: MouseEvent): void {
-    this.canvasState.executeCommand(this.connection.finish(this.getSnapLocation(data)));
+    const snapLocation = this.getSnapLocation(data);
+    if (!snapLocation) {
+      this.connection.finish(data);
+      this.canvasState.draw();
+      return;
+    }
+    this.canvasState.executeCommand(this.connection.finish(snapLocation));
   }
 }
 
