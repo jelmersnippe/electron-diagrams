@@ -1,46 +1,57 @@
 import Connection from '../shapes/Connection';
 import type { Point } from '../shapes/Freehand';
-import type BoundingBox from '../util/BoundingBox';
+import type Shape from '../shapes/Shape';
+import BoundingBox from '../util/BoundingBox';
 import type { ActionPointType } from './ActionPoint';
 import { ActionPoint } from './ActionPoint';
-import type DiagramState from './CanvasState';
-import type { ToolboxConfiguration } from './Toolbox';
 
-type Direction = 'left' | 'right' | 'up' | 'down';
+type Location = 'left' | 'right' | 'top' | 'bottom';
 class ConnectionActionPoint extends ActionPoint {
   private startPoint: Point;
   private endPoint: Point;
   private arrowSidePoints: [Point, Point];
   private connection: Connection;
+  private shape: Shape;
 
   type: ActionPointType = 'connection';
-  constructor(direction: Direction, configuration: ToolboxConfiguration, area: BoundingBox, canvasState: DiagramState) {
-    super(area, canvasState);
-    this.connection = new Connection(this.canvasState, configuration);
 
-    const isVertical = this.area.height > this.area.width;
-    const halfShortSide = isVertical ? this.area.width /2 : this.area.height/ 2;
-    const arrowSideLength = (direction === 'left' || direction === 'up') ? -halfShortSide : halfShortSide;
-    const longSide = isVertical ? this.area.height : this.area.width;
-    let start = isVertical ? { x: this.area.center.x, y: this.area.center.y - (longSide / 2) } : {x: this.area.center.x - (longSide / 2), y: this.area.center.y};
-    let end = isVertical ? { x: this.area.center.x, y: this.area.center.y + (longSide / 2) } : {x: this.area.center.x + (longSide / 2), y: this.area.center.y};
-    if (direction === 'left' || direction === 'up') {
-      const tmp = start;
-      start = end;
-      end = tmp;
-    }
+  constructor(location: Location, shape: Shape) {
+    const width = 16;
+    const length = 30;
+    const arrowSideLength = width / 2;
+
+    const start = shape.boundingBox[location];
+    const end = {
+      x: location === 'left' ? start.x - length : location === 'right' ? start.x + length : start.x,
+      y: location === 'top' ? start.y - length : location === 'bottom' ? start.y + length : start.y,
+    };
+    const area = new BoundingBox(
+      {
+        x: location === 'left' || location === 'right' ? start.x : start.x - width / 2,
+        y: location === 'top' || location === 'bottom' ? start.y : start.y - width / 2,
+      },
+      {
+        x: location === 'left' || location === 'right' ? end.x : end.x + width / 2,
+        y: location === 'top' || location === 'bottom' ? end.y : end.y + width / 2,
+      },
+    );
+    super(area, shape.canvasState);
+
+    this.shape = shape;
     this.startPoint = start;
     this.endPoint = end;
-    this.arrowSidePoints = isVertical
-      ? [
-    {x: end.x - arrowSideLength, y: end.y - arrowSideLength},
-    {x: end.x + arrowSideLength, y: end.y - arrowSideLength},
-      ]
-      : [
-    {x: end.x - arrowSideLength, y: end.y - arrowSideLength},
-    {x: end.x - arrowSideLength, y: end.y + arrowSideLength},
-      ];
+    this.arrowSidePoints = [
+      {
+        x: location === 'left' ? end.x + arrowSideLength : location === 'right' ? end.x - arrowSideLength : end.x - arrowSideLength,
+        y: location === 'top' ? end.y + arrowSideLength : location === 'bottom' ? end.y - arrowSideLength : end.y + arrowSideLength,
+      },
+      {
+        x: location === 'left' ? end.x + arrowSideLength : location === 'right' ? end.x - arrowSideLength : end.x + arrowSideLength,
+        y: location === 'top' ? end.y + arrowSideLength : location === 'bottom' ? end.y - arrowSideLength : end.y - arrowSideLength,
+      },
+    ]; this.connection = new Connection(this.canvasState, shape.configuration);
   }
+
   draw(): void {
     this.canvasState.context.lineWidth = 2;
     this.canvasState.context.strokeStyle = '#000';
