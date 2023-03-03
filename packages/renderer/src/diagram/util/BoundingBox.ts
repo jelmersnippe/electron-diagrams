@@ -1,3 +1,4 @@
+import type { BoundingBoxSide } from '../components/ConnectionActionPoint';
 import type { Point } from '../shapes/Freehand';
 
 class BoundingBox {
@@ -13,7 +14,6 @@ class BoundingBox {
   readonly bottom: Point;
   readonly left: Point;
   readonly right: Point;
-
 
   constructor(pointA: Point, pointB: Point) {
     const minX = Math.min(pointA.x, pointB.x);
@@ -46,8 +46,8 @@ class BoundingBox {
       && point.y >= this.topLeft.y && point.y <= this.bottomRight.y;
   }
 
-  getClosestSide(data: MouseEvent): Point {
-    let closestPoint: Point = this.top;
+  getClosestSide(data: MouseEvent): BoundingBoxSide {
+    let closestPoint: BoundingBoxSide = 'top';
     let minDistance = Infinity;
     for (const direction of ['top', 'left', 'right', 'bottom'] as const) {
       const xDiff = data.x - this[direction].x;
@@ -56,7 +56,7 @@ class BoundingBox {
       const distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
       if (distance <= minDistance) {
         minDistance = distance;
-        closestPoint = this[direction];
+        closestPoint = direction;
       }
     }
     return closestPoint;

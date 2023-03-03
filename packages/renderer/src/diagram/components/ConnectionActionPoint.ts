@@ -5,7 +5,7 @@ import BoundingBox from '../util/BoundingBox';
 import type { ActionPointType } from './ActionPoint';
 import { ActionPoint } from './ActionPoint';
 
-type Location = 'left' | 'right' | 'top' | 'bottom';
+export type BoundingBoxSide = 'left' | 'right' | 'top' | 'bottom';
 class ConnectionActionPoint extends ActionPoint {
   private startPoint: Point;
   private endPoint: Point;
@@ -15,24 +15,24 @@ class ConnectionActionPoint extends ActionPoint {
 
   type: ActionPointType = 'connection';
 
-  constructor(location: Location, shape: Shape) {
+  constructor(side: BoundingBoxSide, shape: Shape) {
     const width = 16;
     const length = 30;
     const arrowSideLength = width / 2;
 
-    const start = shape.boundingBox[location];
+    const start = shape.boundingBox[side];
     const end = {
-      x: location === 'left' ? start.x - length : location === 'right' ? start.x + length : start.x,
-      y: location === 'top' ? start.y - length : location === 'bottom' ? start.y + length : start.y,
+      x: side === 'left' ? start.x - length : side === 'right' ? start.x + length : start.x,
+      y: side === 'top' ? start.y - length : side === 'bottom' ? start.y + length : start.y,
     };
     const area = new BoundingBox(
       {
-        x: location === 'left' || location === 'right' ? start.x : start.x - width / 2,
-        y: location === 'top' || location === 'bottom' ? start.y : start.y - width / 2,
+        x: side === 'left' || side === 'right' ? start.x : start.x - width / 2,
+        y: side === 'top' || side === 'bottom' ? start.y : start.y - width / 2,
       },
       {
-        x: location === 'left' || location === 'right' ? end.x : end.x + width / 2,
-        y: location === 'top' || location === 'bottom' ? end.y : end.y + width / 2,
+        x: side === 'left' || side === 'right' ? end.x : end.x + width / 2,
+        y: side === 'top' || side === 'bottom' ? end.y : end.y + width / 2,
       },
     );
     super(area, shape.canvasState);
@@ -42,14 +42,14 @@ class ConnectionActionPoint extends ActionPoint {
     this.endPoint = end;
     this.arrowSidePoints = [
       {
-        x: location === 'left' ? end.x + arrowSideLength : location === 'right' ? end.x - arrowSideLength : end.x - arrowSideLength,
-        y: location === 'top' ? end.y + arrowSideLength : location === 'bottom' ? end.y - arrowSideLength : end.y + arrowSideLength,
+        x: side === 'left' ? end.x + arrowSideLength : side === 'right' ? end.x - arrowSideLength : end.x - arrowSideLength,
+        y: side === 'top' ? end.y + arrowSideLength : side === 'bottom' ? end.y - arrowSideLength : end.y + arrowSideLength,
       },
       {
-        x: location === 'left' ? end.x + arrowSideLength : location === 'right' ? end.x - arrowSideLength : end.x + arrowSideLength,
-        y: location === 'top' ? end.y + arrowSideLength : location === 'bottom' ? end.y - arrowSideLength : end.y - arrowSideLength,
+        x: side === 'left' ? end.x + arrowSideLength : side === 'right' ? end.x - arrowSideLength : end.x + arrowSideLength,
+        y: side === 'top' ? end.y + arrowSideLength : side === 'bottom' ? end.y - arrowSideLength : end.y - arrowSideLength,
       },
-    ]; this.connection = new Connection(this.canvasState, shape.configuration);
+    ]; this.connection = new Connection([shape, side], this.canvasState, shape.configuration);
   }
 
   draw(): void {
@@ -70,21 +70,21 @@ class ConnectionActionPoint extends ActionPoint {
   start(_data: MouseEvent): void {
     this.connection.start(this.startPoint);
   }
-  private getSnapLocation(data: MouseEvent): Point | null {
-    let snapLocation: Point | null = null;
+  private getSnapLocation(data: MouseEvent): [Shape, BoundingBoxSide] | null {
     for (const shape of this.shape.canvasState.shapes.filter((shape) => shape !== this.shape).filter((shape) => shape.canHaveConnections)) {
       if (!shape.boundingBox.contains(data)) {
         continue;
       }
 
-      snapLocation = shape.boundingBox.getClosestSide(data);
-      break;
+      return [shape, shape.boundingBox.getClosestSide(data)];
     }
-    return snapLocation;
+
+    return null;
   }
   move(data: MouseEvent): void {
     this.canvasState.draw();
-    this.connection.draw(this.getSnapLocation(data) ?? data);
+    const snapLocation = this.getSnapLocation(data);
+    this.connection.draw(snapLocation ? snapLocation[0].boundingBox[snapLocation[1]] : data);
   }
   finish(data: MouseEvent): void {
     const snapLocation = this.getSnapLocation(data);
@@ -93,7 +93,11 @@ class ConnectionActionPoint extends ActionPoint {
       this.canvasState.draw();
       return;
     }
-    this.canvasState.executeCommand(this.connection.finish(snapLocation));
+    this.connection.setAnchor('end', snapLocation);
+    this.canvasState.executeCommand(this.connection.finish(snapLocation[0].boundingBox[snapLocation[1]]));
+
+    this.shape.connections.push({location: snapLocation[1], line: this.connection});
+    snapLocation[0].connections.push({location: snapLocation[1], line: this.connection});
   }
 }
 

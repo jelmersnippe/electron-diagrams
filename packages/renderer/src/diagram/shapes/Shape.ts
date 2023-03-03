@@ -6,7 +6,13 @@ import type Command from './commands/Command';
 import BoundingBox from '../util/BoundingBox';
 import type { Point } from './Freehand';
 import type { ActionPoint } from '../components/ActionPoint';
+import type Connection from './Connection';
+import type { BoundingBoxSide } from '../components/ConnectionActionPoint';
 
+export type ConnectionPoint = {
+  location: BoundingBoxSide;
+  line: Connection;
+}
 export default abstract class Shape {
     cursorType = 'crosshair';
     configuration: ToolboxConfiguration;
@@ -14,6 +20,7 @@ export default abstract class Shape {
     boundingBoxPadding = 5;
     abstract actionPoints: (() => ActionPoint)[];
     abstract canHaveConnections: boolean;
+    connections: ConnectionPoint[] = [];
 
     canvasState: DiagramState;
 
