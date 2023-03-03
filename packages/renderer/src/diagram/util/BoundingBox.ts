@@ -45,6 +45,22 @@ class BoundingBox {
     return point.x >= this.topLeft.x && point.x <= this.bottomRight.x
       && point.y >= this.topLeft.y && point.y <= this.bottomRight.y;
   }
+
+  getClosestSide(data: MouseEvent): Point {
+    let closestPoint: Point = this.top;
+    let minDistance = Infinity;
+    for (const direction of ['top', 'left', 'right', 'bottom'] as const) {
+      const xDiff = data.x - this[direction].x;
+      const yDiff = data.y - this[direction].y;
+
+      const distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+      if (distance <= minDistance) {
+        minDistance = distance;
+        closestPoint = this[direction];
+      }
+    }
+    return closestPoint;
+  }
 }
 
 export default BoundingBox;

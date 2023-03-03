@@ -15,7 +15,7 @@ class DiagramState {
   get context(): CanvasRenderingContext2D {
     return this._context;
   }
-  private shapes: Shape[] = [];
+  shapes: Shape[] = [];
   private history: Command[] = [];
   private _commandIndex = -1;
   private set commandIndex(value: number) {

@@ -68,17 +68,26 @@ class ConnectionActionPoint extends ActionPoint {
     this.canvasState.context.fillRect(this.area.topLeft.x, this.area.topLeft.y, this.area.bottomRight.x - this.area.topLeft.x, this.area.bottomRight.y - this.area.topLeft.y);
   }
   start(_data: MouseEvent): void {
-    console.log('starting connection creationg');
     this.connection.start(this.startPoint);
   }
+  private getSnapLocation(data: MouseEvent): Point {
+    let snapLocation: Point= {x: data.x, y: data.y};
+    for (const shape of this.shape.canvasState.shapes.filter((shape) => shape !== this.shape)) {
+      if (!shape.boundingBox.contains(data)) {
+        continue;
+      }
+
+      snapLocation = shape.boundingBox.getClosestSide(data);
+      break;
+    }
+    return snapLocation;
+  }
   move(data: MouseEvent): void {
-    console.log('moving connection creationg');
     this.canvasState.draw();
-    this.connection.draw(data);
+    this.connection.draw(this.getSnapLocation(data));
   }
   finish(data: MouseEvent): void {
-    console.log('finishing connection creationg');
-    this.canvasState.executeCommand(this.connection.finish(data));
+    this.canvasState.executeCommand(this.connection.finish(this.getSnapLocation(data)));
   }
 }
 
