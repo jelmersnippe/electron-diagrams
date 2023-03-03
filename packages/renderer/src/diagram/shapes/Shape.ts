@@ -21,16 +21,8 @@ export default abstract class Shape {
         this.configuration = configuration;
     }
 
-    private setup() {
+    protected setup() {
         applyToolboxConfiguration(this.canvasState.context, this.configuration);
-    }
-
-    redo() {
-        this.setup();
-    }
-
-    start(_event: Point) {
-        this.setup();
     }
 
     finish(_event: Point): Command {
@@ -39,7 +31,9 @@ export default abstract class Shape {
         return new DrawCommand(this, this.canvasState);
     }
 
-    abstract draw(event: Point): void
+    abstract redo(): void;
+    abstract start(event: MouseEvent): void;
+    abstract draw(event: MouseEvent): void
     abstract setBoundingBox(): void
     abstract move(offset: Point): void;
 }

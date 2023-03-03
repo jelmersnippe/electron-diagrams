@@ -10,7 +10,7 @@ abstract class PredefinedShape extends Shape {
   protected finalPoint: Point | null = null;
 
   start(data: MouseEvent) {
-    super.start(data);
+    this.setup();
     const {x, y} = data;
     this.initialPoint = {x, y};
   }
@@ -29,7 +29,7 @@ abstract class PredefinedShape extends Shape {
   }
 
   redo() {
-    super.redo();
+    this.setup();
     this.printShape();
   }
 

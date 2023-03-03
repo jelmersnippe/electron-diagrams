@@ -9,14 +9,14 @@ class Connection extends Shape {
     private startPoint: Point = {x: 0, y: 0};
     private endPoint: Point = {x: 0, y: 0};
     start(data: Point) {
-        super.start(data);
+      this.setup();
 
         const { x, y } = data;
         this.startPoint = {x, y};
         this.draw(data);
     }
     redo(){
-      super.redo();
+      this.setup();
 
       this.draw(this.endPoint);
     }

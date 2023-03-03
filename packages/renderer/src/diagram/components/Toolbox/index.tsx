@@ -57,6 +57,8 @@ const Toolbox = ({ diagramState }: Props) => {
   return (
     <div className='toolbox'>
       <h2>Toolbox</h2>
+        <button onClick={() => diagramState.undo()}>Undo</button>
+        <button onClick={() => diagramState.redo()}>Redo</button>
       <div>
         <SelectInput
           label="Tool"

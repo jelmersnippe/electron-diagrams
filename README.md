@@ -1,8 +1,9 @@
 # Electron diagrams
 
 ## TODO
+1. A shape should know about all of it's connections so they can update when it moves
+1. Connection shape should actually connect to other shapes, snap to them -> both shapes it connects to should get a reference, the connection itself should be dumb
 1. Change cursor upon entering/leaving MouseInteractible (cursorType or currentTool cursorType)
-1. Connections that spawn from ActionPoint items on activity boxes
 1. Labels for shapes
 1. Text boxes
 1. ToolboxUpdate Command
@@ -14,7 +15,7 @@
 1. Snap to lineup with other things while moving
 
 ## Known BugO's
-1. Cursor position does not always correspond to x and y in MouseEvent
+1. If the canvas is not the full screen the x and y in the data don't match with the actual cursor position
 
 
 ## To think about
