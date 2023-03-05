@@ -1,33 +1,31 @@
 import MoveCommand from '../shapes/commands/MoveCommand';
-import type { Point } from '../shapes/Freehand';
+import Point from '../util/Point';
 import type { ActionPointType } from './ActionPoint';
 import { ActionPoint } from './ActionPoint';
 
 export class MoveActionPoint extends ActionPoint {
   type: ActionPointType = 'move';
-  private initialPoint: Point = { x: 0, y: 0 };
-  private previousPoint: Point = { x: 0, y: 0 };
+  private initialPoint = new Point(0, 0);
+  private previousPoint = new Point(0, 0);
 
-  start(data: MouseEvent): void {
-    const { x, y } = data;
-    this.initialPoint = { x, y };
-    this.previousPoint = { x, y };
+  start(point: Point): void {
+    this.initialPoint = point;
+    this.previousPoint = point;
   }
 
-  move(data: MouseEvent): void {
-    const { x, y } = data;
+  move(point: Point): void {
     for (const shape of this.canvasState.selectedShapes) {
-      shape.move({ x: x - this.previousPoint.x, y: y - this.previousPoint.y });
+      shape.move(point.subtract(this.previousPoint));
     }
     this.canvasState.draw();
-    this.previousPoint = { x, y };
+    this.previousPoint = point;
   }
 
-  finish(data: MouseEvent): void {
-    const movedOffset: Point = { x: data.x - this.initialPoint.x, y: data.y - this.initialPoint.y };
+  finish(point: Point): void {
+    const movedOffset = point.subtract(this.initialPoint);
     // Revert all shapes back to initial position
     for (const shape of this.canvasState.selectedShapes) {
-      shape.move({ x: -movedOffset.x, y: -movedOffset.y });
+      shape.move(movedOffset.opposite());
     }
 
     this.canvasState.executeCommand(new MoveCommand(this.canvasState.selectedShapes, movedOffset));

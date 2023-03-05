@@ -1,6 +1,7 @@
 import type Command from '../shapes/commands/Command';
 import type Shape from '../shapes/Shape';
 import type BoundingBox from '../util/BoundingBox';
+import Point from '../util/Point';
 import type { ActionPoint } from './ActionPoint';
 import MoveActionPoint from './MoveActionPoint';
 import SelectTool from './Toolbox/tools/SelectTool';
@@ -60,6 +61,7 @@ class DiagramState {
 
   private mouseDownCallback = this.mouseDown.bind(this);
   private mouseDown(data: MouseEvent) {
+    const point = new Point(data.x, data.y);
     if (this.interactingWithActionPoint) {
       return;
     }
@@ -70,14 +72,14 @@ class DiagramState {
     }
 
     for (const actionPoint of this.actionPoints) {
-      if (actionPoint.area.contains(data)) {
+      if (actionPoint.area.contains(point)) {
         actionPoint.onMouseDown(data);
         return;
       }
     }
 
     for (const shape of [...this.shapes].reverse()) {
-      if (shape.boundingBox?.contains(data)) {
+      if (shape.boundingBox?.contains(point)) {
         this.selectedShapes = [shape];
         return;
       }

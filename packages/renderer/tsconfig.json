@@ -12,6 +12,7 @@
     "esModuleInterop": true,
     "types": ["node"],
     "baseUrl": ".",
+    "noEmit": true,
     "paths": {
       "#preload": ["../preload/src/index"],
       "/@/*": ["./src/*"]

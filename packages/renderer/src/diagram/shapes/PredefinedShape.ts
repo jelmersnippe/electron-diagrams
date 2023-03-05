@@ -1,6 +1,6 @@
 import BoundingBox from '../util/BoundingBox';
+import Point from '../util/Point';
 import type Command from './commands/Command';
-import type { Point } from './Freehand';
 import Shape from './Shape';
 
 abstract class PredefinedShape extends Shape {
@@ -9,23 +9,20 @@ abstract class PredefinedShape extends Shape {
   protected initialPoint: Point | null = null;
   protected finalPoint: Point | null = null;
 
-  start(data: MouseEvent) {
+  start(point: Point) {
     this.setup();
-    const {x, y} = data;
-    this.initialPoint = {x, y};
+    this.initialPoint = point;
   }
 
-  draw(data: MouseEvent) {
-    const {x, y} = data;
-    this.finalPoint = {x, y};
+  draw(point: Point) {
+    this.finalPoint = point;
     this.setBoundingBox();
   }
 
-  finish(data: MouseEvent): Command {
-    const {x, y} = data;
-    this.finalPoint = {x, y};
+  finish(point: Point): Command {
+    this.finalPoint = point;
 
-    return super.finish(data);
+    return super.finish(point);
   }
 
   redo() {
@@ -38,15 +35,12 @@ abstract class PredefinedShape extends Shape {
       throw new Error('Tried to set bounding box for predefined shape without two points set');
     }
 
-    const correctedFinalPoint = this.finalPoint;
     const width = this.finalPoint.x - this.initialPoint.x;
     const height = this.finalPoint.y - this.initialPoint.y;
-    if (Math.abs(width) < this.minWidth) {
-      correctedFinalPoint.x = this.initialPoint.x + (width === 0 ? this.minWidth : Math.sign(width) * this.minWidth);
-    }
-    if (Math.abs(height) < this.minHeight) {
-      correctedFinalPoint.y = this.initialPoint.y + (height === 0 ? this.minHeight : Math.sign(height) * this.minHeight);
-    }
+    const correctedFinalPoint = new Point(
+      Math.abs(width) >= this.minWidth ? this.initialPoint.x + width : this.initialPoint.x + (width === 0 ? this.minWidth : Math.sign(width) * this.minWidth),
+      Math.abs(height) >= this.minHeight ? this.initialPoint.y + height : this.initialPoint.y + (height === 0 ? this.minHeight : Math.sign(height) * this.minHeight),
+    );
 
     this.boundingBox = new BoundingBox(this.initialPoint, correctedFinalPoint);
     this.canvasState.draw();
@@ -58,8 +52,8 @@ abstract class PredefinedShape extends Shape {
       throw new Error('Tried to move a PredefinedShape without a set bounding box');
     }
 
-    const {topLeft, bottomRight} = this.boundingBox;
-    this.boundingBox = new BoundingBox({x: topLeft.x + offset.x, y: topLeft.y + offset.y}, {x: bottomRight.x + offset.x, y: bottomRight.y + offset.y});
+    const { topLeft, bottomRight } = this.boundingBox;
+    this.boundingBox = new BoundingBox(topLeft.add(offset), bottomRight.add(offset));
   }
 
   abstract printShape(): void;

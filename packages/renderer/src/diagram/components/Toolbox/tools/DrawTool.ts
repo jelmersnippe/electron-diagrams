@@ -4,6 +4,7 @@ import Tool from './Tool';
 import type { ShapeType } from '/@/diagram/shapes/Freehand';
 import { createShape } from '/@/diagram/shapes/Freehand';
 import type Shape from '/@/diagram/shapes/Shape';
+import Point from '/@/diagram/util/Point';
 
 class DrawTool extends Tool {
   private shape: Shape | null = null;
@@ -16,23 +17,23 @@ class DrawTool extends Tool {
     this.configuration = configuration;
   }
 
-  start(data: MouseEvent): void {
+  start(point: Point): void {
     this.shape = createShape(this.shapeType, this.canvasState, this.configuration);
-    this.shape.start(data);
+    this.shape.start(point);
   }
-  move(data: MouseEvent): void {
+  move(point: Point): void {
     if (!this.shape) {
       console.error('No shape created while already in move event of DrawCommand');
       return;
     }
-    this.shape.draw(data);
+    this.shape.draw(point);
   }
-  finish(data: MouseEvent): void {
+  finish(point: Point): void {
     if (!this.shape) {
       console.error('No shape created while already in finish event of DrawCommand');
       return;
     }
-    const resultCommand = this.shape.finish(data);
+    const resultCommand = this.shape.finish(point);
     this.canvasState.executeCommand(resultCommand);
   }
 }

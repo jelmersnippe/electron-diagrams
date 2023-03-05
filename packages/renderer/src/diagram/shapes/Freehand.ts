@@ -2,11 +2,11 @@ import type { ActionPoint } from '../components/ActionPoint';
 import type DiagramState from '../components/CanvasState';
 import type { ToolboxConfiguration } from '../components/Toolbox';
 import BoundingBox from '../util/BoundingBox';
+import Point from '../util/Point';
 import Box from './Box';
 import type Command from './commands/Command';
 import Shape from './Shape';
 
-export type Point = { x: number; y: number; }
 class Freehand extends Shape {
   canHaveConnections = false;
   actionPoints: (() => ActionPoint)[] = [];
@@ -30,31 +30,28 @@ class Freehand extends Shape {
     }
   }
 
-  start(data: Point) {
+  start(point: Point) {
     this.setup();
 
-    const { x, y } = data;
-    this.prevPoint = { x, y };
-    this.draw(data);
+    this.prevPoint = point;
+    this.draw(point);
   }
 
-  draw(data: Point) {
-    const { x, y } = data;
+  draw(point: Point) {
     if (this.prevPoint !== null) {
       this.canvasState.context.beginPath();
       this.canvasState.context.moveTo(this.prevPoint.x, this.prevPoint.y);
-      this.points.push({ x, y });
-      this.canvasState.context.lineTo(x, y);
+      this.points.push(point);
+      this.canvasState.context.lineTo(point.x, point.y);
       this.canvasState.context.stroke();
     }
 
-    this.prevPoint = { x, y };
+    this.prevPoint = point;
   }
 
-  finish(data: Point): Command {
-    const { x, y } = data;
-    this.points.push({ x, y });
-    return super.finish(data);
+  finish(point: Point): Command {
+    this.points.push(point);
+    return super.finish(point);
   }
 
   setBoundingBox() {
@@ -62,13 +59,12 @@ class Freehand extends Shape {
     const xValues = this.points.map((point) => point.x);
     const yValues = this.points.map((point) => point.y);
 
-    this.boundingBox = new BoundingBox({ x: Math.min(...xValues) - padding, y: Math.min(...yValues) - padding }, { x: Math.max(...xValues) + padding, y: Math.max(...yValues) + padding });
+    this.boundingBox = new BoundingBox(new Point(Math.min(...xValues) - padding, Math.min(...yValues) - padding), new Point(Math.max(...xValues) + padding, Math.max(...yValues) + padding));
   }
 
   move(offset: Point) {
-    this.points = this.points.map((point) => ({ x: point.x + offset.x, y: point.y + offset.y }));
+    this.points = this.points.map((point) => point.add(offset));
 
-    // TODO: Move this generic logic to the abstract class
     this.setBoundingBox();
   }
 }

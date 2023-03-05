@@ -3,7 +3,7 @@ import type DiagramState from '../components/CanvasState';
 import type { BoundingBoxSide } from '../components/ConnectionActionPoint';
 import type { ToolboxConfiguration } from '../components/Toolbox';
 import BoundingBox from '../util/BoundingBox';
-import type { Point } from './Freehand';
+import Point from '../util/Point';
 import Shape from './Shape';
 
 class Connection extends Shape {
@@ -11,35 +11,60 @@ class Connection extends Shape {
   actionPoints: (() => ActionPoint)[] = [];
   private startAnchor: [Shape, BoundingBoxSide];
   private endAnchor: [Shape, BoundingBoxSide] | null = null;
+  private points: Point[] = [];
   private get startPoint(): Point {
     return this.startAnchor[0].boundingBox[this.startAnchor[1]];
   }
   private get endPoint(): Point {
-    return this.endAnchor ? this.endAnchor[0].boundingBox[this.endAnchor[1]] : {x: 0, y: 0};
+    return this.endAnchor ? this.endAnchor[0].boundingBox[this.endAnchor[1]] : new Point(0, 0);
   }
+  private arrowSideLength = 8;
+  private getArrowSidePoints = (point: Point, side: BoundingBoxSide) => [
+    {
+      x: side === 'right' ? point.x + this.arrowSideLength : side === 'left' ? point.x - this.arrowSideLength : point.x - this.arrowSideLength,
+      y: side === 'bottom' ? point.y + this.arrowSideLength : side === 'top' ? point.y - this.arrowSideLength : point.y + this.arrowSideLength,
+    },
+    {
+      x: side === 'right' ? point.x + this.arrowSideLength : side === 'left' ? point.x - this.arrowSideLength : point.x + this.arrowSideLength,
+      y: side === 'bottom' ? point.y + this.arrowSideLength : side === 'top' ? point.y - this.arrowSideLength : point.y - this.arrowSideLength,
+    },
+  ];
 
   constructor(start: [Shape, BoundingBoxSide], diagramState: DiagramState, configuration: ToolboxConfiguration) {
     super(diagramState, configuration);
     this.startAnchor = start;
   }
 
-  start(data: Point) {
+  start(point: Point) {
     this.setup();
 
-    this.draw(data);
+    this.draw(point);
+    this.points.push(point);
+  }
+  private calculatePath(point: Point): Point[] {
+    return [];
   }
   redo() {
     this.setup();
 
     this.draw(this.endPoint);
+    if (!this.endAnchor) {
+      return;
+    }
+    this.canvasState.context.beginPath();
+    for (const point of this.getArrowSidePoints(this.endPoint, this.endAnchor[1])) {
+      this.canvasState.context.moveTo(this.endPoint.x, this.endPoint.y);
+      this.canvasState.context.lineTo(point.x, point.y);
+    }
+    this.canvasState.context.stroke();
   }
-  draw(event: Point): void {
+  draw(point: Point): void {
     this.canvasState.context.lineWidth = 2;
     this.canvasState.context.strokeStyle = '#000';
     this.canvasState.context.setLineDash([]);
     this.canvasState.context.beginPath();
     this.canvasState.context.moveTo(this.startPoint.x, this.startPoint.y);
-    this.canvasState.context.lineTo(event.x, event.y);
+    this.canvasState.context.lineTo(point.x, point.y);
     this.canvasState.context.stroke();
   }
   setBoundingBox(): void {

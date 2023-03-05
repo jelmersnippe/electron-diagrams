@@ -1,4 +1,4 @@
-import type { Point } from 'electron';
+import type Point from '../../util/Point';
 import type Shape from '../Shape';
 import type Command from './Command';
 
@@ -19,7 +19,7 @@ class MoveCommand implements Command {
 
   undo() {
     for (const shape of this.shapes) {
-      shape.move({ x: -this.offset.x, y: -this.offset.y });
+      shape.move(this.offset.opposite());
     }
   }
 }

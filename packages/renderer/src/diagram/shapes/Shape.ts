@@ -4,10 +4,10 @@ import DrawCommand from './commands/DrawCommand';
 import type DiagramState from '../components/CanvasState';
 import type Command from './commands/Command';
 import BoundingBox from '../util/BoundingBox';
-import type { Point } from './Freehand';
 import type { ActionPoint } from '../components/ActionPoint';
 import type Connection from './Connection';
 import type { BoundingBoxSide } from '../components/ConnectionActionPoint';
+import Point from '../util/Point';
 
 export type ConnectionPoint = {
   location: BoundingBoxSide;
@@ -16,7 +16,7 @@ export type ConnectionPoint = {
 export default abstract class Shape {
     cursorType = 'crosshair';
     configuration: ToolboxConfiguration;
-    boundingBox: BoundingBox = new BoundingBox({x: 0, y: 0}, {x: 0, y: 0});
+    boundingBox: BoundingBox = new BoundingBox(new Point(0,0), new Point(0,0));
     boundingBoxPadding = 5;
     abstract actionPoints: (() => ActionPoint)[];
     abstract canHaveConnections: boolean;
@@ -33,15 +33,15 @@ export default abstract class Shape {
         applyToolboxConfiguration(this.canvasState.context, this.configuration);
     }
 
-    finish(_event: Point): Command {
+    finish(_point: Point): Command {
         this.setBoundingBox();
 
         return new DrawCommand(this);
     }
 
     abstract redo(): void;
-    abstract start(event: MouseEvent): void;
-    abstract draw(event: MouseEvent): void
+    abstract start(point: Point): void;
+    abstract draw(point: Point): void
     abstract setBoundingBox(): void
     abstract move(offset: Point): void;
 }

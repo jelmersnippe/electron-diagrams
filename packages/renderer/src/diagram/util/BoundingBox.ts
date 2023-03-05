@@ -1,5 +1,5 @@
 import type { BoundingBoxSide } from '../components/ConnectionActionPoint';
-import type { Point } from '../shapes/Freehand';
+import Point from './Point';
 
 class BoundingBox {
   readonly topLeft: Point;
@@ -21,19 +21,19 @@ class BoundingBox {
     const minY = Math.min(pointA.y, pointB.y);
     const maxY = Math.max(pointA.y, pointB.y);
 
-    this.topLeft = { x: minX, y: minY };
-    this.topRight = { x: maxX, y: minY };
-    this.bottomLeft = { x: minX, y: maxY };
-    this.bottomRight = { x: maxX, y: maxY };
+    this.topLeft = new Point(minX, minY);
+    this.topRight = new Point(maxX, minY);
+    this.bottomLeft = new Point(minX, maxY);
+    this.bottomRight = new Point(maxX, maxY);
 
     this.width = maxX - minX;
     this.height = maxY - minY;
 
-    this.center = {x: minX + (this.width / 2), y: minY + (this.height / 2)};
-    this.top = {x: this.center.x, y: minY};
-    this.bottom = {x: this.center.x, y: maxY};
-    this.left = {x: minX, y: this.center.y};
-    this.right = {x: maxX, y: this.center.y};
+    this.center = new Point(minX + (this.width / 2), minY + (this.height / 2));
+    this.top = new Point(this.center.x, minY);
+    this.bottom = new Point(this.center.x, maxY);
+    this.left = new Point(minX, this.center.y);
+    this.right = new Point(maxX, this.center.y);
   }
 
   overlapsWith(boundingBox: BoundingBox): boolean {
@@ -46,12 +46,12 @@ class BoundingBox {
       && point.y >= this.topLeft.y && point.y <= this.bottomRight.y;
   }
 
-  getClosestSide(data: MouseEvent): BoundingBoxSide {
+  getClosestSide(point: Point): BoundingBoxSide {
     let closestPoint: BoundingBoxSide = 'top';
     let minDistance = Infinity;
     for (const direction of ['top', 'left', 'right', 'bottom'] as const) {
-      const xDiff = data.x - this[direction].x;
-      const yDiff = data.y - this[direction].y;
+      const xDiff = point.x - this[direction].x;
+      const yDiff = point.y - this[direction].y;
 
       const distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
       if (distance <= minDistance) {
