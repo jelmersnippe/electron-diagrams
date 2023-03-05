@@ -18,17 +18,14 @@ class Connection extends Shape {
   private get endPoint(): Point {
     return this.endAnchor ? this.endAnchor[0].boundingBox[this.endAnchor[1]] : new Point(0, 0);
   }
-  private arrowSideLength = 8;
-  private getArrowSidePoints = (point: Point, side: BoundingBoxSide) => [
-    {
-      x: side === 'right' ? point.x + this.arrowSideLength : side === 'left' ? point.x - this.arrowSideLength : point.x - this.arrowSideLength,
-      y: side === 'bottom' ? point.y + this.arrowSideLength : side === 'top' ? point.y - this.arrowSideLength : point.y + this.arrowSideLength,
-    },
-    {
-      x: side === 'right' ? point.x + this.arrowSideLength : side === 'left' ? point.x - this.arrowSideLength : point.x + this.arrowSideLength,
-      y: side === 'bottom' ? point.y + this.arrowSideLength : side === 'top' ? point.y - this.arrowSideLength : point.y - this.arrowSideLength,
-    },
-  ];
+  private getArrowSidePoints = (point: Point, side: BoundingBoxSide) => {
+    const sideLengthPoint = new Point(8, 8);
+    const lengthChange = directions[side].multiply(sideLengthPoint);
+    return [
+      point.add(lengthChange).add(directions[side].inverse().multiply(sideLengthPoint)),
+      point.add(lengthChange).subtract(directions[side].inverse().multiply(sideLengthPoint)),
+    ];
+  };
 
   constructor(start: [Shape, BoundingBoxSide], diagramState: DiagramState, configuration: ToolboxConfiguration) {
     super(diagramState, configuration);
@@ -50,7 +47,7 @@ class Connection extends Shape {
     const finalPoint = this.endAnchor ? this.endPoint.add(standoff.multiply(directions[this.endAnchor[1]])) : point;
     if (!finalPoint.isInLineWith(standoffStartPoint)) {
       const distance = finalPoint.subtract(standoffStartPoint);
-      points.push(distance.x > distance. y ? new Point(finalPoint.x, standoffStartPoint.y) : new Point(standoffStartPoint.x, finalPoint.y));
+      points.push(distance.x > distance.y ? new Point(standoffStartPoint.x, finalPoint.y) : new Point(finalPoint.x, standoffStartPoint.y));
     }
 
     points.push(finalPoint);
