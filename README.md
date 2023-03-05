@@ -1,8 +1,8 @@
 # Electron diagrams
 
 ## TODO
-1. A shape should know about all of it's connections so they can update when it moves
-1. Connection shape should actually connect to other shapes, snap to them -> both shapes it connects to should get a reference, the connection itself should be dumb
+1. Dynamic BoundingBox for connections and Freehand -> BoundingPolygon with points
+1. Connection should be made of more points and calculate it's path on every move
 1. Change cursor upon entering/leaving MouseInteractible (cursorType or currentTool cursorType)
 1. Labels for shapes
 1. Text boxes

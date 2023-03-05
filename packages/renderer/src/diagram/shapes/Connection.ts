@@ -1,6 +1,6 @@
 import type { ActionPoint } from '../components/ActionPoint';
 import type DiagramState from '../components/CanvasState';
-import type { BoundingBoxSide } from '../components/ConnectionActionPoint';
+import { BoundingBoxSide, directions } from '../components/ConnectionActionPoint';
 import type { ToolboxConfiguration } from '../components/Toolbox';
 import BoundingBox from '../util/BoundingBox';
 import Point from '../util/Point';
@@ -39,10 +39,26 @@ class Connection extends Shape {
     this.setup();
 
     this.draw(point);
-    this.points.push(point);
   }
   private calculatePath(point: Point): Point[] {
-    return [];
+    const standoff = new Point(20, 20);
+    const points: Point[] = [];
+    points.push(this.startPoint);
+    const standoffStartPoint = this.startPoint.add(standoff.multiply(directions[this.startAnchor[1]]));
+    points.push(standoffStartPoint);
+
+    const finalPoint = this.endAnchor ? this.endPoint.add(standoff.multiply(directions[this.endAnchor[1]])) : point;
+    if (!finalPoint.isInLineWith(standoffStartPoint)) {
+      const distance = finalPoint.subtract(standoffStartPoint);
+      points.push(distance.x > distance. y ? new Point(finalPoint.x, standoffStartPoint.y) : new Point(standoffStartPoint.x, finalPoint.y));
+    }
+
+    points.push(finalPoint);
+    if (this.endAnchor) {
+      points.push(this.endPoint);
+    }
+
+    return points;
   }
   redo() {
     this.setup();
@@ -59,12 +75,15 @@ class Connection extends Shape {
     this.canvasState.context.stroke();
   }
   draw(point: Point): void {
+    const points = this.calculatePath(point);
     this.canvasState.context.lineWidth = 2;
     this.canvasState.context.strokeStyle = '#000';
     this.canvasState.context.setLineDash([]);
     this.canvasState.context.beginPath();
     this.canvasState.context.moveTo(this.startPoint.x, this.startPoint.y);
-    this.canvasState.context.lineTo(point.x, point.y);
+    for (let i = 1; i < points.length; i++) {
+      this.canvasState.context.lineTo(points[i].x, points[i].y);
+    }
     this.canvasState.context.stroke();
   }
   setBoundingBox(): void {
@@ -73,10 +92,11 @@ class Connection extends Shape {
   move(_offset: Point): void {
     this.setBoundingBox();
   }
-  setAnchor(anchor: 'start' | 'end', placement: [Shape, BoundingBoxSide]) {
-    const anchorToUpdate = anchor === 'start' ? 'startAnchor' : 'endAnchor';
-    this[anchorToUpdate] = placement;
-    this.setBoundingBox();
+  setEndAnchor(placement: [Shape, BoundingBoxSide] | null) {
+    this.endAnchor = placement;
+    if (placement) {
+      this.draw(placement[0].boundingBox[placement[1]]);
+    }
   }
 }
 

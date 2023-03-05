@@ -80,7 +80,12 @@ class ConnectionActionPoint extends ActionPoint {
   move(point: Point): void {
     this.canvasState.draw();
     const snapLocation = this.getSnapLocation(point);
-    this.connection.draw(snapLocation ? snapLocation[0].boundingBox[snapLocation[1]] : point);
+    if (snapLocation) {
+      this.connection.setEndAnchor(snapLocation);
+    } else {
+      this.connection.setEndAnchor(null);
+      this.connection.draw(point);
+    }
   }
   finish(point: Point): void {
     const snapLocation = this.getSnapLocation(point);
@@ -89,9 +94,10 @@ class ConnectionActionPoint extends ActionPoint {
       this.canvasState.draw();
       return;
     }
-    this.connection.setAnchor('end', snapLocation);
+    this.connection.setEndAnchor(snapLocation);
     this.canvasState.executeCommand(this.connection.finish(snapLocation[0].boundingBox[snapLocation[1]]));
 
+    // TODO: Move into connection since it has all this information;
     this.shape.connections.push({location: snapLocation[1], line: this.connection});
     snapLocation[0].connections.push({location: snapLocation[1], line: this.connection});
   }

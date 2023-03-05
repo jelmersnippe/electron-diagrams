@@ -25,6 +25,10 @@ class Point {
   opposite() {
     return this.multiply(new Point(-1, -1));
   }
+
+  isInLineWith(point: Point): boolean {
+    return this.x === point.x || this.y === point.y;
+  }
 }
 
 export default Point;
